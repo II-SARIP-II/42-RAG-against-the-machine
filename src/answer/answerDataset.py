@@ -4,7 +4,7 @@ from .answer import Answer
 import os
 import json
 from typing import List
-import logging
+from tqdm import tqdm
 
 
 class AnswerDataset():
@@ -23,18 +23,21 @@ class AnswerDataset():
         if searchResult.k > self.k:
             self.k = searchResult.k
         answerDataset = []
-        for minimalSearchResults in searchResult.search_results:
+        for minimalSearchResults in tqdm(searchResult.search_results, desc="LLM answering"):
             answerMinimalSearch = Answer(minimalSearchResults.question, self.k)
             answerMinimalSearch.searchResults = minimalSearchResults
             answerMinimalSearch.findChunks()
             answerMinimalSearch.generate_answer()
             answerDataset.append(answerMinimalSearch.getMinimalAnswer())
-        self.searchResultAndAnswer = StudentSearchResultsAndAnswerCompleteSource(answerDataset, self.k).model_dump(by_alias=True)
+        self.searchResultAndAnswer = StudentSearchResultsAndAnswerCompleteSource(
+            search_results=answerDataset, 
+            k=self.k
+        ).model_dump(by_alias=True)
 
     def createdAnswerDatasetFile(self) -> None:
         if not self.searchResultAndAnswer:
             raise ValueError("No data to put in the output file")
         os.makedirs(self.output_json_path, exist_ok=True)
-        json_path = self.output_json_path + self.dataset.split("/")[-1]
+        json_path = self.output_json_path + "/" + str(self.dataset).split("/")[-1]
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(self.searchResultAndAnswer, f, indent=4, ensure_ascii=False)

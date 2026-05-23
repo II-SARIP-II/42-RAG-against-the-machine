@@ -37,6 +37,7 @@ def main() -> None:
         case Actions.ANSWER_DATASET:
             answerDataset = AnswerDataset(cast(AnswerDatasetCommand, userInput))
             answerDataset.findSearchDatasetResult()
+            answerDataset.createdAnswerDatasetFile()
         case Actions.EVALUATE:
             pass
     print("WORK DONE !")

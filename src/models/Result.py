@@ -34,5 +34,5 @@ class StudentSearchResultsAndAnswer(StudentSearchResults):
     search_results: List[MinimalAnswer]
 
 
-class StudentSearchResultsAndAnswerCompleteSource(StudentSearchResultsCompleteSource):
+class StudentSearchResultsAndAnswerCompleteSource(StudentSearchResultsAndAnswer):
     search_results: List[MinimalAnswerCompleteSource]

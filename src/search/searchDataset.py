@@ -28,9 +28,9 @@ class SearchDataset():
         if not self.questions:
             raise Exception("No Questions found")
         searchList = []
-        for item in self.questions:
+        for i, item in enumerate(self.questions):
             search: Search = Search(self.k, item.question, None, self.chroma)
-            search.findMinimalSearchResults()
+            search.findMinimalSearchResults(question_id=i)
             searchList.append(search.getMinimalSearchResults())
         self.studentSearchResults = StudentSearchResultsCompleteSource(search_results=searchList, k=self.k).model_dump(by_alias=True)
 

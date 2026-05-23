@@ -1,4 +1,4 @@
-from src.models.Result import MinimalSearchResultsCompleteSource, MinimalAnswer, StudentSearchResultsCompleteSource 
+from src.models.Result import MinimalSearchResultsCompleteSource, MinimalAnswerCompleteSource, StudentSearchResultsCompleteSource 
 from typing import List
 import logging
 import os.path
@@ -73,7 +73,7 @@ class Answer():
             logging.error(f"Failed to generate answer for question {target_result.question_id}: {e}")
             generated_text = "Error: Failed to process generation via local Ollama inference engine."
 
-        minimalAnswer = MinimalAnswer(
+        minimalAnswer = MinimalAnswerCompleteSource(
             question_id=target_result.question_id,
             question=target_result.question,
             retrieved_sources=target_result.retrieved_sources,
@@ -81,7 +81,7 @@ class Answer():
         ).model_dump(by_alias=True)
         self.minimalAnswer = minimalAnswer
 
-    def getMinimalAnswer(self) -> None | MinimalAnswer:
+    def getMinimalAnswer(self) -> None | MinimalAnswerCompleteSource:
         if self.minimalAnswer:
             return self.minimalAnswer
         return None
