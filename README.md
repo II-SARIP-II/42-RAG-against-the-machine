@@ -1,3 +1,6 @@
+
+![42 banner](assets/42banner.jpg)
+
 # Resources
 
 https://pydantic.dev/docs/validation/latest/concepts/serialization/
