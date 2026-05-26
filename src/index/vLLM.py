@@ -10,6 +10,7 @@ from langchain_text_splitters import (
 )
 from src.models.CommandLine import IndexCommand
 from src.models.Source import DetailedSource
+import chromadb
 
 
 class VllmIndexing:
@@ -46,7 +47,8 @@ class VllmIndexing:
         overlap = 0
         all_chunks_text = []
         chunks_complete_data: List[dict] = []
-
+        id_list = []
+        id = 0
         for doc in self.file_text:
             fname = doc.metadata["filename"]
             extension = fname.split('.')[-1].lower() if '.' in fname else ""
@@ -73,6 +75,8 @@ class VllmIndexing:
                 last_char_index = first_char_index + len(text)
 
                 all_chunks_text.append(text)
+                id_list.append(str(id))
+                id += 1
                 chunks_complete_data.append(DetailedSource(
                     chunk_id=len(chunks_complete_data),
                     file_path=doc.metadata["path"],
@@ -94,6 +98,21 @@ class VllmIndexing:
         retriever.index(corpus_tokens)
 
         os.makedirs("data/processed", exist_ok=True)
+        if self.config.chroma:
+            os.makedirs("data/processed/chromadb", exist_ok=True)
+            client = chromadb.PersistentClient(path="data/processed/chromadb")
+            collection = client.create_collection("files_content")
+            batch_size = 4000 
+            
+            for i in range(0, len(all_chunks_text), batch_size):
+                batch_docs = all_chunks_text[i:i + batch_size]
+                batch_ids = id_list[i:i + batch_size]
+                
+                collection.add(
+                    documents=batch_docs,
+                    ids=batch_ids,
+                )
+            print(collection)
         retriever.save("data/processed/bm25_index")
         output_json_path = "data/processed/chunks_corpus.json"
         with open(output_json_path, "w", encoding="utf-8") as f:

@@ -23,6 +23,7 @@ class IndexCommand(UserCommand):
     max_chunk_size: int = Field(default=2000)
     output_directory: Path = Field(default=Path("data/processed/"))
     vllm: Path = Field(default=Path("data/raw/vllm-0.10.1"))
+    chroma: bool = Field(default=False)
 
 
 class SearchCommand(UserCommand):

@@ -6,6 +6,7 @@ import bm25s
 import json
 import os
 from typing import List, cast
+import chromadb
 
 
 class Search():
@@ -27,9 +28,13 @@ class Search():
 
     def findSources(self) -> None:
         query_tokens = bm25s.tokenize(self.prompt)
+        if self.chroma:
+            chroma_result = self.semantic_search()
+            print(chroma_result)
         retriever = bm25s.BM25.load("data/processed/bm25_index",
                                     load_corpus=True)
         docs, _ = retriever.retrieve(query_tokens, k=self.k)
+        print(docs, _)
         with open("data/processed/chunks_corpus.json",
                   "r", encoding="utf-8") as f:
             raw_list = json.load(f)
@@ -45,6 +50,16 @@ class Search():
         sources.sort(key=lambda x: x[0])
         sources_fomatted: List[DetailedSource] = [s for _, s in sources]
         self.sources = sources_fomatted
+
+    def semantic_search(self):
+        client = chromadb.PersistentClient(path="data/processed/chromadb")
+        collection = client.get_collection(name="files_content")
+        results = collection.query(
+            query_texts=[self.prompt],
+            n_results=self.k
+        )
+
+        return results
 
     def findMinimalSearchResults(self, question_id: int = 0) -> None:
         if not self.sources:

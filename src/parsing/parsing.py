@@ -16,12 +16,14 @@ class PipelineCLI:
             self,
             max_chunk_size: int = 2000,
             output_directory: Path = Path("data/processed/"),
-            vllm: Path = Path("data/raw/vllm-0.10.1")
+            vllm: Path = Path("data/raw/vllm-0.10.1"),
+            chroma: bool = False
             ) -> IndexCommand:
         try:
             return IndexCommand(max_chunk_size=max_chunk_size,
                                 output_directory=output_directory,
-                                vllm=vllm)
+                                vllm=vllm,
+                                chroma=chroma)
         except ValidationError as e:
             print(f"Error: {e}")
             sys.exit(1)
@@ -39,7 +41,7 @@ class PipelineCLI:
                 save_directory=save_directory, chroma=chroma
             )
         except ValidationError as e:
-            print(f"Error: {e}")
+            print(f"Errrror: {e}")
             sys.exit(1)
 
     def search_dataset(
