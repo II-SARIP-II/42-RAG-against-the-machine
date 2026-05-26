@@ -15,17 +15,17 @@ class SearchDataset():
         self.output_path = command.save_directory
         self.chroma = command.chroma
 
-    def findAllQuestions(self):
+    def findAllQuestions(self) -> None:
         with open(self.dataset_path, "r", encoding="utf-8") as f:
             raw_list = json.load(f)
-        question_adapter = TypeAdapter(
+        question_adapter: TypeAdapter = TypeAdapter(
             Union[AnsweredQuestion, UnansweredQuestion]
             )
         questions = [question_adapter.validate_python(item)
                      for item in raw_list["rag_questions"]]
         self.questions = questions
 
-    def findQuestionsSources(self):
+    def findQuestionsSources(self) -> None:
         if not self.questions:
             raise Exception("No Questions found")
         searchList = []
@@ -38,14 +38,16 @@ class SearchDataset():
             k=self.k
             ).model_dump(by_alias=True)
 
-    def saveSearchDataset(self):
+    def saveSearchDataset(self) -> None:
         if not self.studentSearchResults:
             raise Exception("No minimalSearchsResults found")
         path = (str(self.output_path) + '/' +
                 str(self.dataset_path).split('/')[-1])
         os.makedirs(self.output_path, exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
-            json.dump(self.studentSearchResults,
-                      f,
-                      indent=4,
-                      ensure_ascii=False)
+            json.dump(
+                self.studentSearchResults,
+                f,
+                indent=4,
+                ensure_ascii=False
+                )

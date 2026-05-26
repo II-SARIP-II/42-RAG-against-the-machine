@@ -1,7 +1,9 @@
 from .models.CommandLine import (Actions,
                                  IndexCommand,
                                  SearchDatasetCommand,
-                                 AnswerDatasetCommand)
+                                 AnswerDatasetCommand,
+                                 AnswerCommand,
+                                 SearchCommand)
 from .parsing.parsing import parsing
 from .index.vLLM import VllmIndexing
 from .search.search import Search
@@ -19,6 +21,7 @@ def main() -> None:
             vllm: VllmIndexing = VllmIndexing(cast(IndexCommand, userInput))
             vllm.splitter()
         case Actions.SEARCH:
+            userInput = cast(SearchCommand, userInput)
             search: Search = Search(
                 userInput.k,
                 userInput.prompt,
@@ -30,23 +33,23 @@ def main() -> None:
             search.saveStudentSearchResults()
         case Actions.SEARCH_DATASET:
             try:
-
-                search: SearchDataset = SearchDataset(
+                searchDataset: SearchDataset = SearchDataset(
                     cast(SearchDatasetCommand, userInput)
                     )
-                search.findAllQuestions()
-                search.findQuestionsSources()
-                search.saveSearchDataset()
+                searchDataset.findAllQuestions()
+                searchDataset.findQuestionsSources()
+                searchDataset.saveSearchDataset()
             except Exception as e:
                 print(e)
         case Actions.ANSWER:
             ollama_model = dspy.LM(
-                'ollama_chat/qwen3:0.6b', 
-                api_base='http://localhost:11434', 
-                max_tokens=500, 
+                'ollama_chat/qwen3:0.6b',
+                api_base='http://localhost:11434',
+                max_tokens=500,
                 temperature=0.0
             )
             dspy.settings.configure(lm=ollama_model)
+            userInput = cast(AnswerCommand, userInput)
             answer = Answer(userInput.prompt, userInput.k)
             answer.findSearchResult()
             answer.findChunks()
@@ -54,9 +57,9 @@ def main() -> None:
             answer.createdAnswerFile()
         case Actions.ANSWER_DATASET:
             ollama_model = dspy.LM(
-                'ollama_chat/qwen3:0.6b', 
-                api_base='http://localhost:11434', 
-                max_tokens=500, 
+                'ollama_chat/qwen3:0.6b',
+                api_base='http://localhost:11434',
+                max_tokens=500,
                 temperature=0.0
             )
             dspy.settings.configure(lm=ollama_model)

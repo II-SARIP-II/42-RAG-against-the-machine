@@ -1,10 +1,12 @@
 from src.models.CommandLine import AnswerDatasetCommand
 from src.models.Result import (StudentDetailedSearchResults,
-                               StudentDetailedSearchResultsAndAnswer)
+                               StudentDetailedSearchResultsAndAnswer,
+                               DetailedAnswer)
 from .answer import Answer
 import os
 import json
 from tqdm import tqdm
+from typing import List, cast
 
 
 class AnswerDataset():
@@ -34,7 +36,7 @@ class AnswerDataset():
             answerMinimalSearch.generate_answer()
             answerDataset.append(answerMinimalSearch.getMinimalAnswer())
         self.searchResultAndAnswer = StudentDetailedSearchResultsAndAnswer(
-            search_results=answerDataset,
+            search_results=cast(List[DetailedAnswer | None], answerDataset),
             k=self.k
         ).model_dump(by_alias=True)
 
@@ -45,8 +47,9 @@ class AnswerDataset():
         json_path = (self.output_json_path + "/" +
                      str(self.dataset).split("/")[-1])
         with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(self.searchResultAndAnswer,
-                      f,
-                      indent=4,
-                      ensure_ascii=False
-                      )
+            json.dump(
+                self.searchResultAndAnswer,
+                f,
+                indent=4,
+                ensure_ascii=False
+                )

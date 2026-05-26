@@ -1,6 +1,6 @@
 from src.models.Result import (DetailedAnswer,
                                StudentDetailedSearchResults)
-from typing import List
+from typing import List, Dict
 import logging
 import os.path
 import json
@@ -49,7 +49,10 @@ class Answer():
 
         try:
             predictor = dspy.Predict(SingleSentenceAnswer)
-            prediction = predictor(context=full_context, question=target_result.question)
+            prediction = predictor(
+                context=full_context,
+                question=target_result.question
+                )
             generated_text = prediction.answer.strip()
 
         except Exception as e:
@@ -66,7 +69,7 @@ class Answer():
         ).model_dump(by_alias=True)
         self.minimalAnswer = minimalAnswer
 
-    def getMinimalAnswer(self) -> None | DetailedAnswer:
+    def getMinimalAnswer(self) -> None | Dict:
         if self.minimalAnswer:
             return self.minimalAnswer
         return None

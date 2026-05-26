@@ -5,6 +5,7 @@ from pathlib import Path
 import bm25s
 import json
 import os
+from typing import List, cast
 
 
 class Search():
@@ -14,7 +15,7 @@ class Search():
             prompt: str,
             save_directory: Path | None,
             chroma: bool
-            ):
+            ) -> None:
         self.k = k
         self.prompt = prompt
         self.output_path = save_directory
@@ -24,7 +25,7 @@ class Search():
         except Exception as e:
             print(e)
 
-    def findSources(self):
+    def findSources(self) -> None:
         query_tokens = bm25s.tokenize(self.prompt)
         retriever = bm25s.BM25.load("data/processed/bm25_index",
                                     load_corpus=True)
@@ -42,46 +43,49 @@ class Search():
                 sources.append((rank_idx, validated_source))
 
         sources.sort(key=lambda x: x[0])
-        sources = [source for _, source in sources]
-        self.sources = sources
+        sources_fomatted: List[DetailedSource] = [s for _, s in sources]
+        self.sources = sources_fomatted
 
-    def findMinimalSearchResults(self, question_id: int = 1):
+    def findMinimalSearchResults(self, question_id: int = 0) -> None:
         if not self.sources:
             raise Exception("No sources found")
         searchResult = DetailedSearchResults(question_id="q"+str(question_id),
                                              question=self.prompt,
                                              retrieved_sources=self.sources
                                              ).model_dump(by_alias=True)
-        self.minimalSearchResult = searchResult
+        self.detailedSearchResult = searchResult
 
-    def getMinimalSearchResults(self):
-        return self.minimalSearchResult
+    def getMinimalSearchResults(self) -> DetailedSearchResults:
+        return cast(DetailedSearchResults, self.detailedSearchResult)
 
-    def saveMinimalSearchResults(self):
+    def saveMinimalSearchResults(self) -> None:
         if not self.output_path:
             raise Exception("No ouput path found")
-        if not self.minimalSearchResult:
+        if not self.detailedSearchResult:
             raise Exception("No MinimalsearchResult found")
         path = str(self.output_path) + "/MinimalSearchResult.json"
         os.makedirs(self.output_path, exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
-            json.dump(self.minimalSearchResult,
+            json.dump(self.detailedSearchResult,
                       f,
                       indent=4,
                       ensure_ascii=False)
 
-    def findStudentSearchResults(self):
+    def findStudentSearchResults(self) -> None:
         self.studentSearchResult = StudentDetailedSearchResults(
-            search_results=[self.minimalSearchResult],
+            search_results=cast(List[DetailedSearchResults],
+                                [self.detailedSearchResult]),
             k=self.k
             ).model_dump(by_alias=True)
 
-    def getStudentSearchResults(self):
-        return self.studentSearchResult
+    def getStudentSearchResults(self) -> StudentDetailedSearchResults:
+        return cast(StudentDetailedSearchResults, self.studentSearchResult)
 
-    def saveStudentSearchResults(self):
+    def saveStudentSearchResults(self) -> None:
         if not self.studentSearchResult:
             raise Exception("No studentSearchResult found")
+        if not self.output_path:
+            raise Exception("No output path declared")
         path = str(self.output_path) + "/StudentSearchResults.json"
         os.makedirs(self.output_path, exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
@@ -89,6 +93,3 @@ class Search():
                       f,
                       indent=4,
                       ensure_ascii=False)
-
-    def answer(self):
-        pass

@@ -45,7 +45,7 @@ class VllmIndexing:
 
         overlap = 0
         all_chunks_text = []
-        chunks_complete_data: List[DetailedSource] = []
+        chunks_complete_data: List[dict] = []
 
         for doc in self.file_text:
             fname = doc.metadata["filename"]
