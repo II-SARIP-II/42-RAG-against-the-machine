@@ -7,6 +7,6 @@ class MinimalSource(BaseModel):
     last_character_index: int
 
 
-class CompleteSource(MinimalSource):
+class DetailedSource(MinimalSource):
     chunk_id: int
     text: str

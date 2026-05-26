@@ -1,4 +1,5 @@
-from src.models.Result import MinimalSearchResultsCompleteSource, MinimalAnswerCompleteSource, StudentSearchResultsCompleteSource 
+from src.models.Result import (DetailedAnswer,
+                               StudentDetailedSearchResults)
 from typing import List
 import logging
 import os.path
@@ -10,7 +11,7 @@ class Answer():
     def __init__(self, question: str, k: int):
         self.question = question
         self.k = k
-        self.model_name = "qwen3:0.6b" 
+        self.model_name = "qwen3:0.6b"
         self.output_json_path = "data/output/answer_result"
 
     def findSearchResult(self) -> None:
@@ -21,7 +22,9 @@ class Answer():
         with open(path, 'r', encoding='utf-8') as f:
             searchResultsDict = json.load(f)
 
-        searchResults = StudentSearchResultsCompleteSource.model_validate(searchResultsDict)
+        searchResults = StudentDetailedSearchResults.model_validate(
+            searchResultsDict
+            )
         self.searchResults = searchResults.search_results[0]
 
     def findChunks(self) -> None:
@@ -44,16 +47,21 @@ class Answer():
         target_result = self.searchResults
 
         system_instruction = (
-            "You are a precise technical assistant answering questions about the vLLM codebase.\n"
+            "You are a precise technical assistant answering questions "
+            "about the vLLM codebase.\n"
             "Your answers must be:\n"
-            "1. Self-contained: readable without seeing the original question.\n"
+            "1. Self-contained: readable without seeing the "
+            "original question.\n"
             "2. Source-grounded: rely strictly on the provided context.\n"
-            "3. Faithful: do not hallucinate information outside the context.\n"
+            "3. Faithful: do not hallucinate information outside"
+            " the context.\n"
             "4. Relevant: directly address the query.\n\n"
-            "If the context does not contain the answer, state clearly that the information is missing."
+            "If the context does not contain the answer, state clearly "
+            "that the information is missing."
         )
 
-        user_prompt = f"Context from codebase:\n{full_context}\n\nQuestion: {target_result.question}"
+        user_prompt = (f"Context from codebase:\n{full_context}\n\n"
+                       f"Question: {target_result.question}")
 
         try:
             response = ollama.chat(
@@ -70,10 +78,12 @@ class Answer():
             generated_text = response['message']['content'].strip()
 
         except Exception as e:
-            logging.error(f"Failed to generate answer for question {target_result.question_id}: {e}")
-            generated_text = "Error: Failed to process generation via local Ollama inference engine."
+            logging.error("Failed to generate answer for "
+                          f"question {target_result.question_id}: {e}")
+            generated_text = ("Error: Failed to process generation "
+                              "via local Ollama inference engine.")
 
-        minimalAnswer = MinimalAnswerCompleteSource(
+        minimalAnswer = DetailedAnswer(
             question_id=target_result.question_id,
             question=target_result.question,
             retrieved_sources=target_result.retrieved_sources,
@@ -81,7 +91,7 @@ class Answer():
         ).model_dump(by_alias=True)
         self.minimalAnswer = minimalAnswer
 
-    def getMinimalAnswer(self) -> None | MinimalAnswerCompleteSource:
+    def getMinimalAnswer(self) -> None | DetailedAnswer:
         if self.minimalAnswer:
             return self.minimalAnswer
         return None
@@ -91,5 +101,3 @@ class Answer():
         json_path = self.output_json_path + "/answer.json"
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(self.minimalAnswer, f, indent=4, ensure_ascii=False)
-
-

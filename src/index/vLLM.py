@@ -9,7 +9,8 @@ from langchain_text_splitters import (
     Language
 )
 from src.models.CommandLine import IndexCommand
-from src.models.Source import CompleteSource
+from src.models.Source import DetailedSource
+
 
 class VllmIndexing:
     def __init__(self, data: IndexCommand):
@@ -39,11 +40,12 @@ class VllmIndexing:
             self.create_map()
 
         if not self.file_text:
-            raise ValueError(f"Error: No text files found in path: {self.vllm_path}")
+            raise ValueError("Error: No text files found"
+                             f"in path: {self.vllm_path}")
 
         overlap = 0
         all_chunks_text = []
-        chunks_complete_data: List[CompleteSource] = []
+        chunks_complete_data: List[DetailedSource] = []
 
         for doc in self.file_text:
             fname = doc.metadata["filename"]
@@ -71,7 +73,7 @@ class VllmIndexing:
                 last_char_index = first_char_index + len(text)
 
                 all_chunks_text.append(text)
-                chunks_complete_data.append(CompleteSource(
+                chunks_complete_data.append(DetailedSource(
                     chunk_id=len(chunks_complete_data),
                     file_path=doc.metadata["path"],
                     text=text,
@@ -80,7 +82,8 @@ class VllmIndexing:
                     ).model_dump(by_alias=True))
 
         if not all_chunks_text:
-            raise ValueError("Error: Document splitting resulted in 0 text chunks.")
+            raise ValueError("Error: Document splitting resulted in "
+                             "0 text chunks.")
 
         stemmer = Stemmer.Stemmer("english")
         corpus_tokens = bm25s.tokenize(all_chunks_text,

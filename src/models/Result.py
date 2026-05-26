@@ -1,4 +1,4 @@
-from .Source import MinimalSource, CompleteSource
+from .Source import MinimalSource, DetailedSource
 from typing import List
 from pydantic import BaseModel
 
@@ -9,15 +9,15 @@ class MinimalSearchResults(BaseModel):
     retrieved_sources: List[MinimalSource]
 
 
-class MinimalSearchResultsCompleteSource(MinimalSearchResults):
-    retrieved_sources: List[CompleteSource]
+class DetailedSearchResults(MinimalSearchResults):
+    retrieved_sources: List[DetailedSource]
 
 
 class MinimalAnswer(MinimalSearchResults):
     answer: str
 
 
-class MinimalAnswerCompleteSource(MinimalSearchResultsCompleteSource):
+class DetailedAnswer(DetailedSearchResults):
     answer: str
 
 
@@ -26,13 +26,13 @@ class StudentSearchResults(BaseModel):
     k: int
 
 
-class StudentSearchResultsCompleteSource(StudentSearchResults):
-    search_results: List[MinimalSearchResultsCompleteSource]
+class StudentDetailedSearchResults(StudentSearchResults):
+    search_results: List[DetailedSearchResults]
 
 
 class StudentSearchResultsAndAnswer(StudentSearchResults):
     search_results: List[MinimalAnswer]
 
 
-class StudentSearchResultsAndAnswerCompleteSource(StudentSearchResultsAndAnswer):
-    search_results: List[MinimalAnswerCompleteSource]
+class StudentDetailedSearchResultsAndAnswer(StudentSearchResultsAndAnswer):
+    search_results: List[DetailedAnswer]
