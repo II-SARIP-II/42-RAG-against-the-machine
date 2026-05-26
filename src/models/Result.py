@@ -1,6 +1,10 @@
 from .Source import MinimalSource, DetailedSource
 from typing import List
 from pydantic import BaseModel
+from typing import List
+from pydantic import BaseModel
+from typing import List, Union
+from pydantic import BaseModel
 
 
 class MinimalSearchResults(BaseModel):
@@ -9,15 +13,7 @@ class MinimalSearchResults(BaseModel):
     retrieved_sources: List[MinimalSource]
 
 
-class DetailedSearchResults(MinimalSearchResults):
-    retrieved_sources: List[DetailedSource]
-
-
 class MinimalAnswer(MinimalSearchResults):
-    answer: str
-
-
-class DetailedAnswer(DetailedSearchResults):
     answer: str
 
 
@@ -26,13 +22,22 @@ class StudentSearchResults(BaseModel):
     k: int
 
 
+class StudentSearchResultsAndAnswer(StudentSearchResults):
+    search_results: List[MinimalAnswer]
+
+# Detailed Class
+
+class DetailedSearchResults(MinimalSearchResults):
+    retrieved_sources: List[DetailedSource]
+
+
+class DetailedAnswer(DetailedSearchResults):
+    answer: str
+
+
 class StudentDetailedSearchResults(StudentSearchResults):
     search_results: List[DetailedSearchResults]
 
 
-class StudentSearchResultsAndAnswer(StudentSearchResults):
-    search_results: List[MinimalAnswer]
-
-
 class StudentDetailedSearchResultsAndAnswer(StudentSearchResultsAndAnswer):
-    search_results: List[DetailedAnswer]
+    search_results: List[Union[DetailedAnswer, None]]

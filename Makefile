@@ -3,7 +3,7 @@ MYPY 	:= mypy
 FLAGS	:= --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 install:
-	uv add pydantic fire langchain-text-splitters bm25s PyStemmer numpy tqdm ollama
+	uv add pydantic fire langchain-text-splitters bm25s PyStemmer numpy tqdm ollama dspy
 
 run:
 	@uv run python -m src index

@@ -9,6 +9,7 @@ from .answer.answer import Answer
 from .search.searchDataset import SearchDataset
 from .answer.answerDataset import AnswerDataset
 from typing import cast
+import dspy
 
 
 def main() -> None:
@@ -39,12 +40,26 @@ def main() -> None:
             except Exception as e:
                 print(e)
         case Actions.ANSWER:
+            ollama_model = dspy.LM(
+                'ollama_chat/qwen3:0.6b', 
+                api_base='http://localhost:11434', 
+                max_tokens=500, 
+                temperature=0.0
+            )
+            dspy.settings.configure(lm=ollama_model)
             answer = Answer(userInput.prompt, userInput.k)
             answer.findSearchResult()
             answer.findChunks()
             answer.generate_answer()
             answer.createdAnswerFile()
         case Actions.ANSWER_DATASET:
+            ollama_model = dspy.LM(
+                'ollama_chat/qwen3:0.6b', 
+                api_base='http://localhost:11434', 
+                max_tokens=500, 
+                temperature=0.0
+            )
+            dspy.settings.configure(lm=ollama_model)
             answerDataset = AnswerDataset(
                 cast(AnswerDatasetCommand, userInput)
                 )

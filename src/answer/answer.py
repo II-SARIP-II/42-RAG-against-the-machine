@@ -4,7 +4,8 @@ from typing import List
 import logging
 import os.path
 import json
-import ollama
+import dspy
+from .dspy import SingleSentenceAnswer
 
 
 class Answer():
@@ -46,36 +47,10 @@ class Answer():
         full_context = "\n---\n".join(self.context_chunks)
         target_result = self.searchResults
 
-        system_instruction = (
-            "You are a precise technical assistant answering questions "
-            "about the vLLM codebase.\n"
-            "Your answers must be:\n"
-            "1. Self-contained: readable without seeing the "
-            "original question.\n"
-            "2. Source-grounded: rely strictly on the provided context.\n"
-            "3. Faithful: do not hallucinate information outside"
-            " the context.\n"
-            "4. Relevant: directly address the query.\n\n"
-            "If the context does not contain the answer, state clearly "
-            "that the information is missing."
-        )
-
-        user_prompt = (f"Context from codebase:\n{full_context}\n\n"
-                       f"Question: {target_result.question}")
-
         try:
-            response = ollama.chat(
-                model=self.model_name,
-                messages=[
-                    {"role": "system", "content": system_instruction},
-                    {"role": "user", "content": user_prompt}
-                ],
-                options={
-                    "temperature": 0.0,
-                    "num_predict": 512
-                }
-            )
-            generated_text = response['message']['content'].strip()
+            predictor = dspy.Predict(SingleSentenceAnswer)
+            prediction = predictor(context=full_context, question=target_result.question)
+            generated_text = prediction.answer.strip()
 
         except Exception as e:
             logging.error("Failed to generate answer for "

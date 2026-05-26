@@ -88,7 +88,7 @@ class Search():
             json.dump(self.studentSearchResult,
                       f,
                       indent=4,
-                      nsure_ascii=False)
+                      ensure_ascii=False)
 
     def answer(self):
         pass
