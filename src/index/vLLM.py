@@ -76,14 +76,15 @@ class VllmIndexing:
 
                 all_chunks_text.append(text)
                 id_list.append(str(id))
-                id += 1
+                
                 chunks_complete_data.append(DetailedSource(
-                    chunk_id=len(chunks_complete_data),
+                    chunk_id=str(id),
                     file_path=doc.metadata["path"],
                     text=text,
                     first_character_index=first_char_index,
                     last_character_index=last_char_index
                     ).model_dump(by_alias=True))
+                id += 1
 
         if not all_chunks_text:
             raise ValueError("Error: Document splitting resulted in "
@@ -101,6 +102,10 @@ class VllmIndexing:
         if self.config.chroma:
             os.makedirs("data/processed/chromadb", exist_ok=True)
             client = chromadb.PersistentClient(path="data/processed/chromadb")
+            try:
+                client.delete_collection("files_content")
+            except Exception:
+                pass
             collection = client.create_collection("files_content")
             batch_size = 4000 
             
@@ -112,7 +117,6 @@ class VllmIndexing:
                     documents=batch_docs,
                     ids=batch_ids,
                 )
-            print(collection)
         retriever.save("data/processed/bm25_index")
         output_json_path = "data/processed/chunks_corpus.json"
         with open(output_json_path, "w", encoding="utf-8") as f:
