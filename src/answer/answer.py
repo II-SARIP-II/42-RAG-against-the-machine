@@ -5,15 +5,33 @@ import logging
 import os.path
 import json
 import dspy
-from .dspy import SingleSentenceAnswer
+from .dspy import RAG_sign
+
+
+class Model():
+    """Configure the LLM backend and DSPy predictor."""
+    def __init__(self, model: str):
+        """Initialize the LLM client and predictor."""
+        self.lm = dspy.LM(
+                    model=model,
+                    api_base="http://localhost:8000/v1",
+                    api_key="EMPTY",
+                    max_tokens=256,
+                    temperature=0.1,
+                    frequency_penalty=0.3,
+                    extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+                )
+        dspy.configure(lm=self.lm)
+        self.predictor = dspy.Predict(RAG_sign)
+        print("Model:", model)
 
 
 class Answer():
     def __init__(self, question: str, k: int):
         self.question = question
         self.k = k
-        self.model_name = "qwen3:0.6b"
         self.output_json_path = "data/output/answer_result"
+        self.model = Model("openai/Qwen/Qwen3-0.6B")
 
     def findSearchResult(self) -> None:
         path = "data/output/search_results/StudentSearchResults.json"
@@ -48,24 +66,21 @@ class Answer():
         target_result = self.searchResults
 
         try:
-            predictor = dspy.Predict(SingleSentenceAnswer)
-            prediction = predictor(
-                context=full_context,
-                question=target_result.question
-                )
-            generated_text = prediction.answer.strip()
-
-        except Exception as e:
-            logging.error("Failed to generate answer for "
-                          f"question {target_result.question_id}: {e}")
-            generated_text = ("Error: Failed to process generation "
-                              "via local Ollama inference engine.")
+            result = self.model.predictor(context=full_context, question=self.question)
+            response = result.answer
+            response = response.replace("\n", "")
+            response = response.replace("[[ ## completed ## ]]", "")
+            
+        except dspy.utils.exceptions.ContextWindowExceededError:
+            raise ValueError("The k value is too high")
+        except Exception:
+            raise ValueError("Answering failed")
 
         minimalAnswer = DetailedAnswer(
             question_id=target_result.question_id,
             question=target_result.question,
             retrieved_sources=target_result.retrieved_sources,
-            answer=generated_text
+            answer=response
         ).model_dump(by_alias=True)
         self.minimalAnswer = minimalAnswer
 
