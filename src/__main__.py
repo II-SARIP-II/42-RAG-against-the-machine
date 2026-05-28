@@ -3,7 +3,8 @@ from .models.CommandLine import (Actions,
                                  SearchDatasetCommand,
                                  AnswerDatasetCommand,
                                  AnswerCommand,
-                                 SearchCommand)
+                                 SearchCommand,
+                                 EvaluateCommand)
 from .parsing.parsing import parsing
 from .index.vLLM import VllmIndexing
 from .search.search import Search
@@ -11,8 +12,7 @@ from .answer.answer import Answer
 from .search.searchDataset import SearchDataset
 from .answer.answerDataset import AnswerDataset
 from typing import cast
-import dspy
-
+from .evaluate.evaluate import Evaluate
 
 def main() -> None:
     userInput = parsing()
@@ -26,7 +26,8 @@ def main() -> None:
                 userInput.k,
                 userInput.prompt,
                 userInput.save_directory,
-                userInput.chroma
+                userInput.chroma,
+                questionid="q0"
                 )
             search.findMinimalSearchResults()
             search.findStudentSearchResults()
@@ -42,13 +43,6 @@ def main() -> None:
             except Exception as e:
                 print(e)
         case Actions.ANSWER:
-            ollama_model = dspy.LM(
-                'ollama_chat/qwen3:0.6b',
-                api_base='http://localhost:11434',
-                max_tokens=500,
-                temperature=0.0
-            )
-            dspy.settings.configure(lm=ollama_model)
             userInput = cast(AnswerCommand, userInput)
             answer = Answer(userInput.prompt, userInput.k)
             answer.findSearchResult()
@@ -56,20 +50,13 @@ def main() -> None:
             answer.generate_answer()
             answer.createdAnswerFile()
         case Actions.ANSWER_DATASET:
-            ollama_model = dspy.LM(
-                'ollama_chat/qwen3:0.6b',
-                api_base='http://localhost:11434',
-                max_tokens=500,
-                temperature=0.0
-            )
-            dspy.settings.configure(lm=ollama_model)
             answerDataset = AnswerDataset(
                 cast(AnswerDatasetCommand, userInput)
                 )
             answerDataset.findSearchDatasetResult()
             answerDataset.createdAnswerDatasetFile()
         case Actions.EVALUATE:
-            pass
+            recall = Evaluate(cast(EvaluateCommand, userInput))
     print("WORK DONE !")
 
 

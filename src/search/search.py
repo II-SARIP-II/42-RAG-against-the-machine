@@ -16,10 +16,12 @@ class Search():
             k: int,
             prompt: str,
             save_directory: Path | None,
-            chroma: bool
+            chroma: bool,
+            questionid
             ) -> None:
         self.k = k
         self.prompt = prompt
+        self.id = questionid
         self.output_path = save_directory
         self.chroma = chroma
         try:
@@ -79,10 +81,10 @@ class Search():
         return sorted_ids
 
 
-    def findMinimalSearchResults(self, question_id: int = 0) -> None:
+    def findMinimalSearchResults(self) -> None:
         if not self.sources:
             raise Exception("No sources found")
-        searchResult = DetailedSearchResults(question_id="q"+str(question_id),
+        searchResult = DetailedSearchResults(question_id=self.id,
                                              question=self.prompt,
                                              retrieved_sources=self.sources
                                              ).model_dump(by_alias=True)

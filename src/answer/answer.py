@@ -23,7 +23,6 @@ class Model():
                 )
         dspy.configure(lm=self.lm)
         self.predictor = dspy.Predict(RAG_sign)
-        print("Model:", model)
 
 
 class Answer():
