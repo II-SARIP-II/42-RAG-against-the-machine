@@ -57,6 +57,7 @@ def main() -> None:
             answerDataset.createdAnswerDatasetFile()
         case Actions.EVALUATE:
             recall = Evaluate(cast(EvaluateCommand, userInput))
+            recall.calculate_recall()
     print("WORK DONE !")
 
 
