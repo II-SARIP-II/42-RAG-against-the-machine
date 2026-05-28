@@ -1,0 +1,42 @@
+{
+    "question_id": "q0",
+    "question": "What activation formats does the fused batched MoE layer return in vLLM?",
+    "retrieved_sources": [
+        {
+            "file_path": "data/raw/vllm-0.10.1/vllm/model_executor/layers/fused_moe/fused_batched_moe.py",
+            "first_character_index": 0,
+            "last_character_index": 888,
+            "chunk_id": 6789,
+            "text": "# SPDX-License-Identifier: Apache-2.0\n# SPDX-FileCopyrightText: Copyright contributors to the vLLM project\n\"\"\"Fused batched MoE kernel.\"\"\"\nfrom typing import Optional\n\nimport torch\n\nimport vllm.model_executor.layers.fused_moe.modular_kernel as mk\nfrom vllm.model_executor.layers.fused_moe.config import FusedMoEQuantConfig\nfrom vllm.model_executor.layers.fused_moe.fused_moe import (\n    get_config_dtype_str, try_get_optimal_moe_config)\nfrom vllm.model_executor.layers.fused_moe.topk_weight_and_reduce import (\n    TopKWeightAndReduceDelegate, TopKWeightAndReduceNaiveBatched)\nfrom vllm.model_executor.layers.fused_moe.utils import (\n    _resize_cache, moe_kernel_quantize_input, normalize_batched_scales_shape,\n    normalize_scales_shape)\nfrom vllm.model_executor.layers.quantization.utils.quant_utils import (\n    group_broadcast)\nfrom vllm.triton_utils import tl, triton\n\n\n@triton.jit"
+        },
+        {
+            "file_path": "data/raw/vllm-0.10.1/vllm/model_executor/layers/quantization/compressed_tensors/compressed_tensors_moe.py",
+            "first_character_index": 29187,
+            "last_character_index": 31171,
+            "chunk_id": 7637,
+            "text": "self.rocm_aiter_fused_experts_func = rocm_aiter_fused_experts\n        elif self.use_marlin:\n            prepare_moe_fp8_layer_for_marlin(layer, False)\n            # Activations not quantized for marlin.\n            del layer.w13_input_scale\n            del layer.w2_input_scale\n            self.fused_experts_func = None\n        else:\n            from vllm.model_executor.layers.fused_moe import fused_experts\n            self.fused_experts_func = fused_experts\n\n    def select_gemm_impl(\n        self,\n        prepare_finalize: FusedMoEPrepareAndFinalize,\n        moe: FusedMoEConfig,\n    ) -> FusedMoEPermuteExpertsUnpermute:\n        # cutlass path\n        if self.use_cutlass:\n            from vllm.model_executor.layers.fused_moe import (\n                CutlassBatchedExpertsFp8, CutlassExpertsFp8)\n\n            experts: FusedMoEPermuteExpertsUnpermute\n\n            num_dispatchers = prepare_finalize.num_dispatchers()\n\n            if (prepare_finalize.activation_format ==\n                    FusedMoEActivationFormat.BatchedExperts):\n                logger.debug(\"CutlassBatchedExpertsFp8(%s)\",\n                             self.__class__.__name__)\n                experts = CutlassBatchedExpertsFp8(\n                    moe.num_local_experts,\n                    num_dispatchers,\n                    moe.in_dtype,\n                    self.input_quant.strategy == QuantizationStrategy.TOKEN,\n                    self.weight_quant.strategy == QuantizationStrategy.CHANNEL,\n                )\n            else:\n                logger.debug(\"CutlassExpertsFp8(%s)\", self.__class__.__name__)\n                experts = CutlassExpertsFp8(\n                    moe.in_dtype,\n                    self.input_quant.strategy == QuantizationStrategy.TOKEN,\n                    self.weight_quant.strategy == QuantizationStrategy.CHANNEL,\n                )\n\n            self.disable_expert_map = (num_dispatchers > 1\n                                       or not experts.supports_expert_map())"
+        },
+        {
+            "file_path": "data/raw/vllm-0.10.1/vllm/model_executor/layers/fused_moe/cutlass_moe.py",
+            "first_character_index": 0,
+            "last_character_index": 926,
+            "chunk_id": 6977,
+            "text": "# SPDX-License-Identifier: Apache-2.0\n# SPDX-FileCopyrightText: Copyright contributors to the vLLM project\n\"\"\" CUTLASS based Fused MoE kernels.\"\"\"\nfrom typing import Callable, Optional\n\nimport torch\n\nimport vllm.model_executor.layers.fused_moe.modular_kernel as mk\nfrom vllm import _custom_ops as ops\nfrom vllm.logger import init_logger\nfrom vllm.model_executor.layers.fused_moe.config import FusedMoEQuantConfig\nfrom vllm.model_executor.layers.fused_moe.prepare_finalize import (\n    MoEPrepareAndFinalizeNoEP)\nfrom vllm.model_executor.layers.fused_moe.topk_weight_and_reduce import (\n    TopKWeightAndReduceDelegate, TopKWeightAndReduceNoOP)\nfrom vllm.model_executor.layers.fused_moe.utils import (_fp8_perm,\n                                                        _fp8_quantize,\n                                                        _resize_cache)\nfrom vllm.scalar_type import scalar_types\n\nlogger = init_logger(__name__)"
+        },
+        {
+            "file_path": "data/raw/vllm-0.10.1/vllm/model_executor/layers/quantization/modelopt.py",
+            "first_character_index": 39383,
+            "last_character_index": 41200,
+            "chunk_id": 7531,
+            "text": "class ModelOptNvFp4FusedMoE(FusedMoEMethodBase):\n    \"\"\"\n    MoE Method for FP4 Quantization.\n    Args:\n        quant_config: NVFP4 Quant Config\n    \"\"\"\n\n    def __init__(\n        self,\n        quant_config: ModelOptNvFp4Config,\n        moe: FusedMoEConfig,\n        layer: torch.nn.Module,\n    ) -> None:\n        from vllm.model_executor.layers.quantization.utils.nvfp4_moe_support import (  # noqa: E501\n            detect_nvfp4_moe_support)\n        super().__init__(moe)\n        self.quant_config = quant_config\n        self.layer = layer\n        _nvfp4 = detect_nvfp4_moe_support(self.__class__.__name__)\n        self.cutlass_nvfp4_supported = _nvfp4.cutlass_supported\n        self.allow_flashinfer = _nvfp4.allow_flashinfer\n        self.use_marlin = _nvfp4.use_marlin\n        self.flashinfer_moe_backend = None\n\n        if self.allow_flashinfer:\n            flashinfer_moe_backend = envs.VLLM_FLASHINFER_MOE_BACKEND\n            if flashinfer_moe_backend == \"throughput\":\n                self.flashinfer_moe_backend = FlashinferMoeBackend.CUTLASS\n                logger.info_once(\"Using FlashInfer CUTLASS kernels for \"\n                                 \"ModelOptNvFp4FusedMoE.\")\n            elif flashinfer_moe_backend == \"latency\":\n                self.flashinfer_moe_backend = FlashinferMoeBackend.TENSORRT_LLM\n                logger.info_once(\"Using FlashInfer TensorRT-LLM kernels for \"\n                                 \"ModelOptNvFp4FusedMoE.\")\n            else:\n                allowed_backends = [\"throughput\", \"latency\"]\n                raise ValueError(\n                    f\"Unknown flashinfer moe backend: {flashinfer_moe_backend}\"\n                    f\" expected one of {allowed_backends}\")\n\n        self.fused_experts: Optional[\n            mk.FusedMoEModularKernel] = None  # type: ignore[assignment]"
+        },
+        {
+            "file_path": "data/raw/vllm-0.10.1/docs/getting_started/installation/cpu.md",
+            "first_character_index": 9439,
+            "last_character_index": 9926,
+            "chunk_id": 4312,
+            "text": "### Which quantization configs does vLLM CPU support?\n\n- vLLM CPU supports quantizations:\n    - AWQ (x86 only)\n    - GPTQ (x86 only)\n    - compressed-tensor INT8 W8A8 (x86, s390x)\n\n### (x86 only) What is the purpose of `VLLM_CPU_MOE_PREPACK` and `VLLM_CPU_SGL_KERNEL`?\n\n- Both of them requires `amx` CPU flag.\n    - `VLLM_CPU_MOE_PREPACK` can provides better performance for MoE models\n    - `VLLM_CPU_SGL_KERNEL` can provides better performance for MoE models and small-batch scenarios."
+        }
+    ],
+    "answer": "vLLM supports activation formats such as BatchedExperts. "
+}
