@@ -18,10 +18,11 @@ class SearchDataset():
     def findAllQuestions(self) -> None:
         with open(self.dataset_path, "r", encoding="utf-8") as f:
             raw_list = json.load(f)
-        question_adapter: TypeAdapter = TypeAdapter(
+        q_adapter: TypeAdapter[
+            Union[AnsweredQuestion, UnansweredQuestion]] = TypeAdapter(
             Union[AnsweredQuestion, UnansweredQuestion]
-            )
-        questions = [question_adapter.validate_python(item)
+        )
+        questions = [q_adapter.validate_python(item)
                      for item in raw_list["rag_questions"]]
         self.questions = questions
 
@@ -30,7 +31,8 @@ class SearchDataset():
             raise Exception("No Questions found")
         searchList = []
         for i, item in enumerate(self.questions):
-            search: Search = Search(self.k, item.question, None, self.chroma, item.question_id)
+            search: Search = Search(self.k, item.question, None,
+                                    self.chroma, item.question_id)
             search.findMinimalSearchResults()
             searchList.append(search.getMinimalSearchResults())
         self.studentSearchResults = StudentDetailedSearchResults(

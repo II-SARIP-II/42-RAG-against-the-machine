@@ -1,7 +1,6 @@
 from src.models.Result import (DetailedAnswer,
                                StudentDetailedSearchResults)
 from typing import List, Dict
-import logging
 import os.path
 import json
 import dspy
@@ -19,7 +18,8 @@ class Model():
                     max_tokens=256,
                     temperature=0.1,
                     frequency_penalty=0.3,
-                    extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+                    extra_body={"chat_template_kwargs":
+                                {"enable_thinking": False}},
                 )
         dspy.configure(lm=self.lm)
         self.predictor = dspy.Predict(RAG_sign)
@@ -65,11 +65,12 @@ class Answer():
         target_result = self.searchResults
 
         try:
-            result = self.model.predictor(context=full_context, question=self.question)
+            result = self.model.predictor(context=full_context,
+                                          question=self.question)
             response = result.answer
             response = response.replace("\n", "")
             response = response.replace("[[ ## completed ## ]]", "")
-            
+
         except dspy.utils.exceptions.ContextWindowExceededError:
             raise ValueError("The k value is too high")
         except Exception:
@@ -83,7 +84,7 @@ class Answer():
         ).model_dump(by_alias=True)
         self.minimalAnswer = minimalAnswer
 
-    def getMinimalAnswer(self) -> None | Dict:
+    def getMinimalAnswer(self) -> None | Dict[str, int]:
         if self.minimalAnswer:
             return self.minimalAnswer
         return None

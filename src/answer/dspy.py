@@ -8,5 +8,6 @@ class RAG_sign(dspy.Signature):
     )
     question: str = dspy.InputField()
     answer: str = dspy.OutputField(
-        desc="answer ONLY. one or two sentences. Mention the original source. No markdown, No symbols."
+        desc=("answer ONLY. one or two sentences. Mention the original source."
+              " No markdown, No symbols.")
     )

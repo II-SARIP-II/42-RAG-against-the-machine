@@ -46,7 +46,7 @@ class VllmIndexing:
 
         overlap = 0
         all_chunks_text = []
-        chunks_complete_data: List[dict] = []
+        chunks_complete_data: List[dict[str, Any]] = []
         id_list = []
         id = 0
         for doc in self.file_text:
@@ -76,9 +76,9 @@ class VllmIndexing:
 
                 all_chunks_text.append(text)
                 id_list.append(str(id))
-                
+
                 chunks_complete_data.append(DetailedSource(
-                    chunk_id=str(id),
+                    chunk_id=id,
                     file_path=doc.metadata["path"],
                     text=text,
                     first_character_index=first_char_index,
@@ -107,12 +107,12 @@ class VllmIndexing:
             except Exception:
                 pass
             collection = client.create_collection("files_content")
-            batch_size = 4000 
-            
+            batch_size = 4000
+
             for i in range(0, len(all_chunks_text), batch_size):
                 batch_docs = all_chunks_text[i:i + batch_size]
                 batch_ids = id_list[i:i + batch_size]
-                
+
                 collection.add(
                     documents=batch_docs,
                     ids=batch_ids,
