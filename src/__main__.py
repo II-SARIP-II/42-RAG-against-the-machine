@@ -21,6 +21,7 @@ def main() -> None:
         case Actions.INDEX:
             vllm: VllmIndexing = VllmIndexing(cast(IndexCommand, userInput))
             vllm.splitter()
+            vllm.save_indexing()
         case Actions.SEARCH:
             userInput = cast(SearchCommand, userInput)
             search: Search = Search(

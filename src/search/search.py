@@ -23,6 +23,7 @@ class Search():
         self.id = questionid
         self.output_path = save_directory
         self.chroma = chroma
+        self.long_range_k = 100
         try:
             self.findSources()
         except Exception as e:
@@ -32,7 +33,9 @@ class Search():
         query_tokens = bm25s.tokenize(self.prompt)
         retriever = bm25s.BM25.load("data/processed/bm25_index",
                                     load_corpus=True)
-        docs, _ = retriever.retrieve(query_tokens, k=100)
+        if self.k > self.long_range_k:
+            self.long_range_k = self.k
+        docs, _ = retriever.retrieve(query_tokens, k=self.long_range_k)
         bm25_ids = [str(idx) for idx in docs[0]]
 
         final_ranked_ids = []
@@ -66,7 +69,7 @@ class Search():
         collection = client.get_collection(name="files_content")
         results = collection.query(
             query_texts=[self.prompt],
-            n_results=100
+            n_results=self.long_range_k
         )
         return results
 

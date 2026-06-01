@@ -89,9 +89,13 @@ class VllmIndexing:
         if not all_chunks_text:
             raise ValueError("Error: Document splitting resulted in "
                              "0 text chunks.")
+        self.all_chunks_text = all_chunks_text
+        self.id_list = id_list
+        self.chunks_complete_data = chunks_complete_data
 
+    def save_indexing(self) -> None:
         stemmer = Stemmer.Stemmer("english")
-        corpus_tokens = bm25s.tokenize(all_chunks_text,
+        corpus_tokens = bm25s.tokenize(self.all_chunks_text,
                                        stopwords="en",
                                        stemmer=stemmer
                                        )
@@ -108,10 +112,9 @@ class VllmIndexing:
                 pass
             collection = client.create_collection("files_content")
             batch_size = 4000
-
-            for i in range(0, len(all_chunks_text), batch_size):
-                batch_docs = all_chunks_text[i:i + batch_size]
-                batch_ids = id_list[i:i + batch_size]
+            for i in range(0, len(self.all_chunks_text), batch_size):
+                batch_docs = self.all_chunks_text[i:i + batch_size]
+                batch_ids = self.id_list[i:i + batch_size]
 
                 collection.add(
                     documents=batch_docs,
@@ -120,7 +123,7 @@ class VllmIndexing:
         retriever.save("data/processed/bm25_index")
         output_json_path = "data/processed/chunks_corpus.json"
         with open(output_json_path, "w", encoding="utf-8") as f:
-            json.dump(chunks_complete_data, f, indent=4, ensure_ascii=False)
+            json.dump(self.chunks_complete_data, f, indent=4, ensure_ascii=False)
 
     @staticmethod
     def get_language(extension: str) -> Language | None:
