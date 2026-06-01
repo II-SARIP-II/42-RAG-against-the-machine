@@ -23,7 +23,7 @@ class Search():
         self.id = questionid
         self.output_path = save_directory
         self.chroma = chroma
-        self.long_range_k = 100
+        self.long_range_k = 50
         try:
             self.findSources()
         except Exception as e:
@@ -37,6 +37,7 @@ class Search():
             self.long_range_k = self.k
         docs, _ = retriever.retrieve(query_tokens, k=self.long_range_k)
         bm25_ids = [str(idx) for idx in docs[0]]
+        print(self.prompt)
 
         final_ranked_ids = []
         if self.chroma:

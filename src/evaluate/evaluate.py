@@ -34,9 +34,9 @@ class Evaluate():
 
     def calculate_recall(self) -> float:
         total_expected = len(self.answers.rag_questions)
-        print(total_expected, len(self.searched_data.search_results))
+        print(self.config.answer_path, self.config.dataset_path)
         if total_expected == 0:
-            print("Recall: 0.0%")
+            print("Error Recall: 0.0%")
             return 0.0
 
         answers_dict = {answer.question_id: answer
@@ -49,7 +49,7 @@ class Evaluate():
                     count += 1
                     print(question.question)
         recall = (count / total_expected) * 100
-        print(f"Recall: {recall:.2f}%")
+        print(f"good Recall: {recall:.2f}%")
         return recall
 
     def is_matching(self,
@@ -60,7 +60,6 @@ class Evaluate():
         expected_answer = answers_dict[question.question_id]
         if not isinstance(expected_answer, AnsweredQuestion):
             return False
-
         for qsource in question.retrieved_sources:
             for asource in expected_answer.sources:
                 if qsource.file_path != asource.file_path:

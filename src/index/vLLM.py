@@ -94,12 +94,10 @@ class VllmIndexing:
         self.chunks_complete_data = chunks_complete_data
 
     def save_indexing(self) -> None:
-        stemmer = Stemmer.Stemmer("english")
         corpus_tokens = bm25s.tokenize(self.all_chunks_text,
                                        stopwords="en",
-                                       stemmer=stemmer
                                        )
-        retriever = bm25s.BM25()
+        retriever = bm25s.BM25(k1=1.2, b=0.75)
         retriever.index(corpus_tokens)
 
         os.makedirs("data/processed", exist_ok=True)
