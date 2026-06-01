@@ -31,18 +31,42 @@ class Evaluate():
             raise (ValueError(f"Cannot read {self.config.answer_path}"))
 
     def calculate_recall(self):
+        total_expected = len(self.answers.rag_questions)
+        print(total_expected, len(self.searched_data.search_results))
+        if total_expected == 0:
+            print("Recall: 0.0%")
+            return 0.0
+
         answers_dict = {answer.question_id: answer for answer in self.answers.rag_questions}
         count = 0
+
         for question in self.searched_data.search_results:
             if question.question_id in answers_dict:
+                if self.is_matching(question, answers_dict):
+                    count += 1
+        recall = (count / total_expected) * 100
+        print(f"Recall: {recall:.2f}%")
+        return recall
 
-                
+    def is_matching(self, question, answers_dict):
+        expected_answer = answers_dict[question.question_id]
 
-    def is_matching()
         for qsource in question.retrieved_sources:
-            if qsource.file_path != answers_dict[question.question_id].sources.file_path:
-                continue
-            if not is_overlaped(qsource, answers_dict[question.question_id].sources):
-                continue
-            return True
+            for asource in expected_answer.sources:
+                if qsource.file_path != asource.file_path:
+                    continue
+                if not self.is_overlaped(qsource, asource):
+                    continue
+                return True
         return False
+
+    def is_overlaped(self, qsource, asource):
+        overlap_start = max([qsource.first_character_index, asource.first_character_index])
+        overlap_end = min([qsource.last_character_index, asource.last_character_index])
+        overlap_len = overlap_end - overlap_start
+        if overlap_len < 0:
+            return False
+        asrc_len = asource.last_character_index - asource.first_character_index
+        overlap_score = (overlap_len / asrc_len)
+        return  overlap_score >= 0.05
+
