@@ -8,6 +8,7 @@ import os
 from typing import List, cast, Any, Dict
 import chromadb
 import dspy
+import Stemmer
 from .query_expansion import Expansion_sign
 
 
@@ -57,6 +58,8 @@ class Search():
                 new_prompt += self.query_expansion()
             except:
                 pass
+        stemmer = Stemmer.Stemmer("english")
+        query_tokens = bm25s.tokenize(new_prompt, stemmer=stemmer)
         query_tokens = bm25s.tokenize(new_prompt)
         retriever = bm25s.BM25.load("data/processed/bm25_index",
                                     load_corpus=True)
