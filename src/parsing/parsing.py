@@ -33,12 +33,14 @@ class PipelineCLI:
             prompt: str,
             k: int = 5,
             save_directory: Path = Path("data/output/search_results"),
-            chroma: bool = False
+            chroma: bool = False,
+            expansion: bool = False
             ) -> SearchCommand:
         try:
             return SearchCommand(
                 prompt=prompt, k=k,
-                save_directory=save_directory, chroma=chroma
+                save_directory=save_directory, chroma=chroma,
+                expansion=expansion
             )
         except ValidationError as e:
             print(f"Errrror: {e}")
@@ -49,12 +51,14 @@ class PipelineCLI:
             dataset_path: Path,
             k: int = 5,
             save_directory: Path = Path("data/output/search_results"),
-            chroma: bool = False
+            chroma: bool = False,
+            expansion: bool = False
             ) -> SearchDatasetCommand:
         try:
             return SearchDatasetCommand(
                 k=k, dataset_path=dataset_path,
-                save_directory=save_directory, chroma=chroma
+                save_directory=save_directory, chroma=chroma,
+                expansion=expansion
             )
         except ValidationError as e:
             print(f"Error: {e}")

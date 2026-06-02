@@ -7,6 +7,24 @@ import json
 import os
 from typing import List, cast, Any, Dict
 import chromadb
+import dspy
+from .query_expansion import Expansion_sign
+
+
+class ExpansionModel():
+    """Configure the LLM backend and DSPy predictor."""
+    def __init__(self, model: str):
+        """Initialize the LLM client and predictor."""
+        self.lm = dspy.LM(
+                    model=model,
+                    api_base="http://localhost:8000/v1",
+                    api_key="EMPTY",
+                    max_tokens=100,
+                    temperature=0.0,
+                    frequency_penalty=0.3,
+                )
+        dspy.configure(lm=self.lm)
+        self.predictor = dspy.Predict(Expansion_sign)
 
 
 class Search():
@@ -16,6 +34,7 @@ class Search():
             prompt: str,
             save_directory: Path | None,
             chroma: bool,
+            expansion: bool,
             questionid: str
             ) -> None:
         self.k = k
@@ -23,21 +42,28 @@ class Search():
         self.id = questionid
         self.output_path = save_directory
         self.chroma = chroma
+        self.expansion = expansion
         self.long_range_k = 50
+        self.model = ExpansionModel("openai/Qwen/Qwen3-0.6B")
         try:
             self.findSources()
         except Exception as e:
             print(e)
 
     def findSources(self) -> None:
-        query_tokens = bm25s.tokenize(self.prompt)
+        new_prompt = self.prompt
+        if self.expansion:
+            try:
+                new_prompt += self.query_expansion()
+            except:
+                pass
+        query_tokens = bm25s.tokenize(new_prompt)
         retriever = bm25s.BM25.load("data/processed/bm25_index",
                                     load_corpus=True)
         if self.k > self.long_range_k:
             self.long_range_k = self.k
         docs, _ = retriever.retrieve(query_tokens, k=self.long_range_k)
         bm25_ids = [str(idx) for idx in docs[0]]
-        print(self.prompt)
 
         final_ranked_ids = []
         if self.chroma:
@@ -64,6 +90,15 @@ class Search():
                 sources_formatted.append(validated_source)
 
         self.sources = sources_formatted
+
+    def query_expansion(self):
+        try:
+            result = self.model.predictor(question=self.prompt)
+            response = result.answer.replace("\n", "").replace("[[ ## completed ## ]]", "")
+            print(f"Expanded query: {response}")
+            return response
+        except Exception:
+            raise ValueError("searching with query expansion failed")
 
     def semantic_search(self) -> Any:
         client = chromadb.PersistentClient(path="data/processed/chromadb")

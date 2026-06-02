@@ -32,6 +32,7 @@ class SearchCommand(UserCommand):
     prompt: str
     save_directory: Path = Field(default=Path("data/output/search_results"))
     chroma: bool = Field(default=False)
+    expansion: bool = Field(default=False)
 
 
 class SearchDatasetCommand(UserCommand):
@@ -40,6 +41,7 @@ class SearchDatasetCommand(UserCommand):
     dataset_path: FilePath
     save_directory: Path = Field(default=Path("data/output/search_results"))
     chroma: bool = Field(default=False)
+    expansion: bool = Field(default=False)
 
 
 class AnswerCommand(UserCommand):

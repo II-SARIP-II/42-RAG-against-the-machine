@@ -14,6 +14,7 @@ class SearchDataset():
         self.dataset_path = command.dataset_path
         self.output_path = command.save_directory
         self.chroma = command.chroma
+        self.expansion = command.expansion
 
     def findAllQuestions(self) -> None:
         with open(self.dataset_path, "r", encoding="utf-8") as f:
@@ -31,8 +32,9 @@ class SearchDataset():
             raise Exception("No Questions found")
         searchList = []
         for i, item in enumerate(self.questions):
-            search: Search = Search(self.k, item.question, None,
-                                    self.chroma, item.question_id)
+            search: Search = Search(k=self.k, prompt=item.question, save_directory=None,
+                                    chroma=self.chroma, questionid=item.question_id,
+                                    expansion=self.expansion)
             search.findMinimalSearchResults()
             searchList.append(search.getMinimalSearchResults())
         self.studentSearchResults = StudentDetailedSearchResults(

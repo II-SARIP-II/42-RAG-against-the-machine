@@ -7,7 +7,7 @@ import dspy
 from .dspy import RAG_sign
 
 
-class Model():
+class AnswerModel():
     """Configure the LLM backend and DSPy predictor."""
     def __init__(self, model: str):
         """Initialize the LLM client and predictor."""
@@ -30,7 +30,7 @@ class Answer():
         self.question = question
         self.k = k
         self.output_json_path = "data/output/answer_result"
-        self.model = Model("openai/Qwen/Qwen3-0.6B")
+        self.model = AnswerModel("openai/Qwen/Qwen3-0.6B")
 
     def findSearchResult(self) -> None:
         path = "data/output/search_results/StudentSearchResults.json"

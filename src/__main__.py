@@ -29,7 +29,8 @@ def main() -> None:
                 userInput.prompt,
                 userInput.save_directory,
                 userInput.chroma,
-                questionid="q0"
+                questionid="q0",
+                expansion=userInput.expansion
                 )
             search.findMinimalSearchResults()
             search.findStudentSearchResults()
