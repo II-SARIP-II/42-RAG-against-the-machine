@@ -8,7 +8,6 @@ import os
 from typing import List, cast, Any, Dict
 import chromadb
 import dspy
-import Stemmer
 from .query_expansion import Expansion_sign
 
 
@@ -56,10 +55,8 @@ class Search():
         if self.expansion:
             try:
                 new_prompt += self.query_expansion()
-            except:
+            except Exception:
                 pass
-        stemmer = Stemmer.Stemmer("english")
-        query_tokens = bm25s.tokenize(new_prompt, stemmer=stemmer)
         query_tokens = bm25s.tokenize(new_prompt)
         retriever = bm25s.BM25.load("data/processed/bm25_index",
                                     load_corpus=True)
@@ -97,7 +94,8 @@ class Search():
     def query_expansion(self):
         try:
             result = self.model.predictor(question=self.prompt)
-            response = result.answer.replace("\n", "").replace("[[ ## completed ## ]]", "")
+            response = result.answer.replace("\n", "")
+            response = response.replace("[[ ## completed ## ]]", "")
             print(f"Expanded query: {response}")
             return response
         except Exception:

@@ -32,8 +32,11 @@ class SearchDataset():
             raise Exception("No Questions found")
         searchList = []
         for i, item in enumerate(self.questions):
-            search: Search = Search(k=self.k, prompt=item.question, save_directory=None,
-                                    chroma=self.chroma, questionid=item.question_id,
+            search: Search = Search(k=self.k,
+                                    prompt=item.question,
+                                    save_directory=None,
+                                    chroma=self.chroma,
+                                    uestionid=item.question_id,
                                     expansion=self.expansion)
             search.findMinimalSearchResults()
             searchList.append(search.getMinimalSearchResults())

@@ -2,7 +2,6 @@ import os
 import json
 from typing import Any, List
 import bm25s
-import Stemmer
 from langchain_core.documents import Document
 from langchain_text_splitters import (
     RecursiveCharacterTextSplitter,
@@ -121,7 +120,8 @@ class VllmIndexing:
         retriever.save("data/processed/bm25_index")
         output_json_path = "data/processed/chunks_corpus.json"
         with open(output_json_path, "w", encoding="utf-8") as f:
-            json.dump(self.chunks_complete_data, f, indent=4, ensure_ascii=False)
+            json.dump(self.chunks_complete_data, f,
+                      indent=4, ensure_ascii=False)
 
     @staticmethod
     def get_language(extension: str) -> Language | None:
