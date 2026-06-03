@@ -36,7 +36,7 @@ class SearchDataset():
                                     prompt=item.question,
                                     save_directory=None,
                                     chroma=self.chroma,
-                                    uestionid=item.question_id,
+                                    questionid=item.question_id,
                                     expansion=self.expansion)
             search.findMinimalSearchResults()
             searchList.append(search.getMinimalSearchResults())

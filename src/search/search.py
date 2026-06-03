@@ -91,7 +91,7 @@ class Search():
 
         self.sources = sources_formatted
 
-    def query_expansion(self):
+    def query_expansion(self) -> Any:
         try:
             result = self.model.predictor(question=self.prompt)
             response = result.answer.replace("\n", "")
