@@ -1,4 +1,3 @@
-from src.models.CommandLine import SearchDatasetCommand
 from src.models.Question import UnansweredQuestion, AnsweredQuestion
 from src.models.Result import StudentDetailedSearchResults
 from src.search.search import Search
@@ -18,7 +17,6 @@ class SearchDataset():
         chroma: bool,
         expansion: bool
     ) -> None:
-        # Utilisation systématique de Path pour la manipulation de fichiers
         self.dataset_path = Path(dataset_path)
         self.output_dir = Path(output_dir)
         self.k = k
