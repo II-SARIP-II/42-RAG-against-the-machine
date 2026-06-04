@@ -161,8 +161,23 @@ this image is for multi-query retrieval, but it works the same for query expansi
 The main difficulty I faced was to understand the subject, to understand each part, what they create and need to work. If i didn't have corrected some of my peers on this project, i would be totally lost.
 
 # Example usage
-Provide clear examples of running your system
+>make init
+>make install
+>make index
 
+in the vllm_fix, to run the vllm:
+>make
+
+in the project:
+>make search (change the file in the make file)
+
+>make search-dataset
+
+>make answer
+
+>make answer-dataset
+
+>make evaluate
 
 
 # Resources

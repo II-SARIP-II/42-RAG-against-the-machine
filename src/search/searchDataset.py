@@ -6,15 +6,24 @@ from pydantic import TypeAdapter
 import json
 from typing import Union
 import os
+from pathlib import Path
 
 
 class SearchDataset():
-    def __init__(self, command: SearchDatasetCommand):
-        self.k = command.k
-        self.dataset_path = command.dataset_path
-        self.output_path = command.save_directory
-        self.chroma = command.chroma
-        self.expansion = command.expansion
+    def __init__(
+        self,
+        dataset_path: Union[str, Path],
+        output_dir: Union[str, Path],
+        k: int,
+        chroma: bool,
+        expansion: bool
+    ) -> None:
+        # Utilisation systématique de Path pour la manipulation de fichiers
+        self.dataset_path = Path(dataset_path)
+        self.output_dir = Path(output_dir)
+        self.k = k
+        self.chroma = chroma
+        self.expansion = expansion
 
     def findAllQuestions(self) -> None:
         with open(self.dataset_path, "r", encoding="utf-8") as f:
@@ -48,9 +57,9 @@ class SearchDataset():
     def saveSearchDataset(self) -> None:
         if not self.studentSearchResults:
             raise Exception("No minimalSearchsResults found")
-        path = (str(self.output_path) + '/' +
+        path = (str(self.output_dir) + '/' +
                 str(self.dataset_path).split('/')[-1])
-        os.makedirs(self.output_path, exist_ok=True)
+        os.makedirs(self.output_dir, exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(
                 self.studentSearchResults,

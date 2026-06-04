@@ -8,7 +8,7 @@ import os
 from typing import List, cast, Any, Dict
 import chromadb
 import dspy
-from .query_expansion import Expansion_sign
+from .queryExpansion import Expansion_sign
 
 
 class ExpansionModel():

@@ -12,7 +12,7 @@ from src.models.Source import DetailedSource
 import chromadb
 
 
-class VllmIndexing:
+class Indexing:
     def __init__(self, data: IndexCommand):
         self.file_text: List[Document] = []
         self.vllm_path = data.vllm

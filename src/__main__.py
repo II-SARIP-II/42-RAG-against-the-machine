@@ -6,7 +6,7 @@ from .models.CommandLine import (Actions,
                                  SearchCommand,
                                  EvaluateCommand)
 from .parsing.parsing import parsing
-from .index.vLLM import VllmIndexing
+from .index.index import Indexing
 from .search.search import Search
 from .answer.answer import Answer
 from .search.searchDataset import SearchDataset
@@ -19,7 +19,7 @@ def main() -> None:
     userInput = parsing()
     match userInput.action:
         case Actions.INDEX:
-            vllm: VllmIndexing = VllmIndexing(cast(IndexCommand, userInput))
+            vllm: Indexing = Indexing(cast(IndexCommand, userInput))
             vllm.splitter()
             vllm.save_indexing()
         case Actions.SEARCH:
@@ -37,8 +37,13 @@ def main() -> None:
             search.saveStudentSearchResults()
         case Actions.SEARCH_DATASET:
             try:
+                userInput = cast(SearchDatasetCommand, userInput)
                 searchDataset: SearchDataset = SearchDataset(
-                    cast(SearchDatasetCommand, userInput)
+                    k=userInput.k,
+                    dataset_path=userInput.dataset_path,
+                    output_dir=userInput.save_directory,
+                    chroma=userInput.chroma,
+                    expansion=userInput.expansion
                     )
                 searchDataset.findAllQuestions()
                 searchDataset.findQuestionsSources()
