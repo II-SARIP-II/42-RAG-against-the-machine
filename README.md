@@ -148,9 +148,17 @@ The query expansion is a bit different, it just gives extra words to the prompt 
 
 
 # Performance analysis
-For the code, my code can go to 61% with the right flags (for k=5) but can be higher if k > 5
+For the code, my code can go to 62% with the right flags (for k=5) but can be higher if k > 5
+only bm25 recall@5 = 57%
+bm25 + chromadb = 61%
+bm25 + chromadb + query expansion = 56%
+bm25 + query expansion = 54%
+Because the llm is not smart, the query expansion is bad
 For the docs, my code only go to 80%/81% (for k=5) but can be higher if k > 5
-
+only bm25 recall@5 = 80%
+bm25 + chromadb = 61%
+bm25 + chromadb + query expansion = 56%
+bm25 + query expansion = 54%
 # Design decisions
 I decided to use the vllm (bonus) by fixing the vllm thanks to my peer https://github.com/Arcanovax
 I also implemented semantic search, hybrid search and query expansion

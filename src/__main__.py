@@ -16,27 +16,29 @@ from .evaluate.evaluate import Evaluate
 
 
 def main() -> None:
-    userInput = parsing()
-    match userInput.action:
-        case Actions.INDEX:
-            vllm: Indexing = Indexing(cast(IndexCommand, userInput))
-            vllm.splitter()
-            vllm.save_indexing()
-        case Actions.SEARCH:
-            userInput = cast(SearchCommand, userInput)
-            search: Search = Search(
-                userInput.k,
-                userInput.prompt,
-                userInput.save_directory,
-                userInput.chroma,
-                questionid="q0",
-                expansion=userInput.expansion
-                )
-            search.findMinimalSearchResults()
-            search.findStudentSearchResults()
-            search.saveStudentSearchResults()
-        case Actions.SEARCH_DATASET:
-            try:
+    try:
+        userInput = parsing()
+        match userInput.action:
+            case Actions.INDEX:
+                vllm: Indexing = Indexing(cast(IndexCommand, userInput))
+                vllm.splitter()
+                vllm.save_indexing()
+
+            case Actions.SEARCH:
+                userInput = cast(SearchCommand, userInput)
+                search: Search = Search(
+                    userInput.k,
+                    userInput.prompt,
+                    userInput.save_directory,
+                    userInput.chroma,
+                    questionid="q0",
+                    expansion=userInput.expansion
+                    )
+                search.findMinimalSearchResults()
+                search.findStudentSearchResults()
+                search.saveStudentSearchResults()
+
+            case Actions.SEARCH_DATASET:
                 userInput = cast(SearchDatasetCommand, userInput)
                 searchDataset: SearchDataset = SearchDataset(
                     k=userInput.k,
@@ -48,26 +50,29 @@ def main() -> None:
                 searchDataset.findAllQuestions()
                 searchDataset.findQuestionsSources()
                 searchDataset.saveSearchDataset()
-            except Exception as e:
-                print(e)
-        case Actions.ANSWER:
-            userInput = cast(AnswerCommand, userInput)
-            answer = Answer(userInput.prompt, userInput.k)
-            answer.findSearchResult()
-            answer.findChunks()
-            answer.generate_answer()
-            answer.createdAnswerFile()
-        case Actions.ANSWER_DATASET:
-            answerDataset = AnswerDataset(
-                cast(AnswerDatasetCommand, userInput)
-                )
-            answerDataset.findSearchDatasetResult()
-            answerDataset.createdAnswerDatasetFile()
-        case Actions.EVALUATE:
-            recall = Evaluate(cast(EvaluateCommand, userInput))
-            recall.calculate_recall()
-    print("WORK DONE !")
 
+            case Actions.ANSWER:
+                userInput = cast(AnswerCommand, userInput)
+                answer = Answer(userInput.prompt, userInput.k)
+                answer.findSearchResult()
+                answer.findChunks()
+                answer.generate_answer()
+                answer.createdAnswerFile()
+
+            case Actions.ANSWER_DATASET:
+                answerDataset = AnswerDataset(
+                    cast(AnswerDatasetCommand, userInput)
+                    )
+                answerDataset.findSearchDatasetResult()
+                answerDataset.createdAnswerDatasetFile()
+
+            case Actions.EVALUATE:
+                recall = Evaluate(cast(EvaluateCommand, userInput))
+                recall.calculate_recall()
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt")
+    except Exception as e:
+        print(e)
 
 if __name__ == "__main__":
     main()

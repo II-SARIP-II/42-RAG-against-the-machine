@@ -16,7 +16,6 @@ class Evaluate():
     def get_result(self) -> StudentDetailedSearchResults:
         """Load search results JSON."""
         try:
-            print(self.config.dataset_path)
             with open(self.config.dataset_path, "r", encoding="utf-8") as file:
                 data = file.read()
                 return StudentDetailedSearchResults(**json.loads(data))
@@ -34,7 +33,6 @@ class Evaluate():
 
     def calculate_recall(self) -> float:
         total_expected = len(self.answers.rag_questions)
-        print(self.config.answer_path, self.config.dataset_path)
         if total_expected == 0:
             print("Error Recall: 0.0%")
             return 0.0
@@ -47,9 +45,8 @@ class Evaluate():
             if question.question_id in answers_dict:
                 if self.is_matching(question, answers_dict):
                     count += 1
-                    print(question.question)
         recall = (count / total_expected) * 100
-        print(f"good Recall: {recall:.2f}%")
+        print(f"\nRecall: {recall:.2f}%")
         return recall
 
     def is_matching(self,
