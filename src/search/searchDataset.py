@@ -6,6 +6,7 @@ import json
 from typing import Union
 import os
 from pathlib import Path
+from tqdm import tqdm
 
 
 class SearchDataset():
@@ -38,7 +39,7 @@ class SearchDataset():
         if not self.questions:
             raise Exception("No Questions found")
         searchList = []
-        for i, item in enumerate(self.questions):
+        for item in tqdm(self.questions, desc="Retrieval"):
             search: Search = Search(k=self.k,
                                     prompt=item.question,
                                     save_directory=None,

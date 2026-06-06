@@ -49,7 +49,11 @@ class Evaluate():
                 if self.is_matching(question, answers_dict[question.question_id]):
                     count += 1
         recall = (count / total_expected) * 100
+
         print(f"\nRecall@{self.k}: {recall:.2f}%")
+        if self.max_context_length != 2000:
+            print("To get real score, "
+                  "put max_context_length to 2000 (base score)")
         return recall
 
     def is_matching(self,
@@ -64,7 +68,6 @@ class Evaluate():
                 if qsource.file_path == asource.file_path:
                     if self.is_overlaped(qsource, asource):
                         return True
-        print(question.question)
         return False
 
     def is_overlaped(
@@ -72,6 +75,8 @@ class Evaluate():
             qsource: DetailedSource,
             asource: MinimalSource
             ) -> bool:
+        if (qsource.last_character_index - qsource.first_character_index > self.max_context_length):
+            qsource.last_character_index = (qsource.first_character_index + self.max_context_length)
         overlap_start = max([qsource.first_character_index,
                              asource.first_character_index])
         overlap_end = min([qsource.last_character_index,

@@ -9,6 +9,10 @@ from typing import List, cast, Any, Dict
 import chromadb
 import dspy
 from .queryExpansion import Expansion_sign
+import logging
+
+
+logging.getLogger("dspy").setLevel(logging.ERROR)
 
 
 class ExpansionModel():
@@ -96,7 +100,6 @@ class Search():
             result = self.model.predictor(question=self.prompt)
             response = result.answer.replace("\n", "")
             response = response.replace("[[ ## completed ## ]]", "")
-            print(f"Expanded query: {response}")
             return response
         except Exception:
             raise ValueError("searching with query expansion failed")
