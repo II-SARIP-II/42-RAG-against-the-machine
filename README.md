@@ -164,6 +164,7 @@ bm25 + query expansion = 87%
 I decided to use the vllm (bonus) by fixing the vllm thanks to my peer https://github.com/Arcanovax
 I also implemented semantic search, hybrid search and query expansion
 this image is for multi-query retrieval, but it works the same for query expansion.
+I implemented a little cache that look in the files if the answers have already been generated.
 ![query expansion](assets/query_expansion.webp)
 
 # Challenges faced

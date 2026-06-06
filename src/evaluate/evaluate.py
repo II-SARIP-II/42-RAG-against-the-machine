@@ -2,13 +2,14 @@ from src.models.Result import (StudentDetailedSearchResults,
                                DetailedSearchResults)
 from src.models.RagDataset import RagDataset
 import json
-from src.models.CommandLine import EvaluateCommand
+from pathlib import Path
 from src.models.Question import AnsweredQuestion, UnansweredQuestion
 from src.models.Source import DetailedSource, MinimalSource
 
 
 class Evaluate():
-    def __init__(self, dataset_path, k, answer_path, max_context_length) -> None:
+    def __init__(self, dataset_path: Path, k: int, answer_path: Path,
+                 max_context_length: int) -> None:
         self.dataset_path = dataset_path
         self.k = k
         self.answer_path = answer_path
@@ -46,7 +47,8 @@ class Evaluate():
 
         for question in self.searched_data.search_results:
             if question.question_id in answers_dict:
-                if self.is_matching(question, answers_dict[question.question_id]):
+                if self.is_matching(question,
+                                    answers_dict[question.question_id]):
                     count += 1
         recall = (count / total_expected) * 100
 
@@ -62,7 +64,7 @@ class Evaluate():
                     ) -> bool:
         if not isinstance(expected_answer, AnsweredQuestion):
             return False
-            
+
         for qsource in question.retrieved_sources[:self.k]:
             for asource in expected_answer.sources:
                 if qsource.file_path == asource.file_path:
@@ -75,8 +77,10 @@ class Evaluate():
             qsource: DetailedSource,
             asource: MinimalSource
             ) -> bool:
-        if (qsource.last_character_index - qsource.first_character_index > self.max_context_length):
-            qsource.last_character_index = (qsource.first_character_index + self.max_context_length)
+        if (qsource.last_character_index -
+                qsource.first_character_index > self.max_context_length):
+            qsource.last_character_index = (qsource.first_character_index +
+                                            self.max_context_length)
         overlap_start = max([qsource.first_character_index,
                              asource.first_character_index])
         overlap_end = min([qsource.last_character_index,

@@ -1,7 +1,7 @@
 from src.models.Result import (DetailedAnswer,
                                StudentDetailedSearchResults,
                                StudentDetailedSearchResultsAndAnswer)
-from typing import List, Dict, Union, cast
+from typing import List, Any
 import os.path
 import json
 import dspy
@@ -64,6 +64,7 @@ class Answer():
         self.context_chunks = chunks_extracted
 
     def generate_answer(self) -> None:
+        self.minimalAnswer: Any
         res = None
         if os.path.exists(self.output_json_path):
             res = self.getPastAnswers
@@ -93,7 +94,7 @@ class Answer():
             ).model_dump(by_alias=True)
             self.minimalAnswer = minimalAnswer
 
-    def getPastAnswers(self):
+    def getPastAnswers(self) -> Any:
         f1 = Path(self.output_json_path) / "dataset_docs_public.json"
         f2 = Path(self.output_json_path) / "dataset_code_public.json"
         if f1.exists():
@@ -101,7 +102,7 @@ class Answer():
         if f2.exists():
             return self.getAnsweredFromFile(f2)
 
-    def getAnsweredFromFile(self, path: Path) -> Dict[str, int]:
+    def getAnsweredFromFile(self, path: Path) -> Any:
         with open(path, 'r', encoding='utf-8') as f:
             AnswerResultsDict = json.load(f)
 
@@ -109,11 +110,11 @@ class Answer():
             AnswerResultsDict
             )
         for item in AnswerResults.search_results:
-            if item.question == self.question:
+            if item is not None and item.question == self.question:
                 return item
         return None
 
-    def getMinimalAnswer(self) -> None | Dict[str, int]:
+    def getMinimalAnswer(self) -> Any:
         if self.minimalAnswer:
             return self.minimalAnswer
         return None
