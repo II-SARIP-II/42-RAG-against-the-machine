@@ -10,6 +10,7 @@ import chromadb
 import dspy
 from .queryExpansion import Expansion_sign
 import logging
+import sys
 
 
 logging.getLogger("dspy").setLevel(logging.ERROR)
@@ -62,7 +63,14 @@ class Search():
             except Exception:
                 pass
         query_tokens = bm25s.tokenize(new_prompt)
-        retriever = bm25s.BM25.load("data/processed/bm25_index",
+        bm25_path = Path("data/processed/bm25_index")
+        corpus_path = Path("data/processed/chunks_corpus.json")
+
+        if not bm25_path.exists() or not corpus_path.is_file():
+            print("\nMissing BM25 processed directory or corpus")
+            sys.exit()
+
+        retriever = bm25s.BM25.load(bm25_path,
                                     load_corpus=True)
         if self.k > self.long_range_k:
             self.long_range_k = self.k
@@ -79,7 +87,7 @@ class Search():
         else:
             final_ranked_ids = bm25_ids[:self.k]
 
-        with open("data/processed/chunks_corpus.json",
+        with open(corpus_path,
                   "r", encoding="utf-8") as f:
             raw_list = json.load(f)
         corpus_dict = {str(item.get("chunk_id")): item for item in raw_list
@@ -105,7 +113,12 @@ class Search():
             raise ValueError("searching with query expansion failed")
 
     def semantic_search(self) -> Any:
-        client = chromadb.PersistentClient(path="data/processed/chromadb")
+        chroma_path = Path("data/processed/chromadb")
+
+        if not chroma_path.exists():
+            print("\nMissing Chroma processed directory or corpus")
+            sys.exit()
+        client = chromadb.PersistentClient(path=chroma_path)
         collection = client.get_collection(name="files_content")
         results = collection.query(
             query_texts=[self.prompt],
