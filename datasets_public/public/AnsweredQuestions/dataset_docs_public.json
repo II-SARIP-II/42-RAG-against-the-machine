@@ -384,9 +384,9 @@
       "answer": "CUDA compiler version 12.8 or later is required for building cutlass_scaled_mm kernels for Blackwell SM100 (c3x/CUTLASS 3.x) in vLLM's CMake build configuration.",
       "sources": [
         {
-          "file_path": "data/raw/vllm-0.10.1/CMakeLists.txt",
-          "first_character_index": 17949,
-          "last_character_index": 19384
+          "file_path": "data/raw/vllm-0.10.1/docs/getting_started/installation/gpu/cuda.inc.md",
+          "first_character_index": 0,
+          "last_character_index": 1024
         }
       ],
       "difficulty": "synthetic",
@@ -580,9 +580,9 @@
       "answer": "The `LlamaForCausalLM` architecture supports tensor parallelism for Llama models including Llama 3.1, Llama 3, Llama 2, LLaMA, and Yi variants in vLLM's supported models documentation.",
       "sources": [
         {
-          "file_path": "data/raw/vllm-0.10.1/docs/models/supported_models.md",
-          "first_character_index": 17942,
-          "last_character_index": 19791
+          "file_path": "data/raw/vllm-0.10.1/docs/configuration/optimization.md",
+          "first_character_index": 4253,
+          "last_character_index": 5719
         }
       ],
       "difficulty": "synthetic",
@@ -888,9 +888,9 @@
       "answer": "CUDA compiler version 12.0 or later is required to build Machete kernels in vLLM's CMake build system.",
       "sources": [
         {
-          "file_path": "data/raw/vllm-0.10.1/CMakeLists.txt",
-          "first_character_index": 31032,
-          "last_character_index": 32876
+          "file_path": "data/raw/vllm-0.10.1/docs/getting_started/installation/gpu/cuda.inc.md",
+          "first_character_index": 0,
+          "last_character_index": 1024
         }
       ],
       "difficulty": "synthetic",
@@ -972,9 +972,9 @@
       "answer": "To build a vLLM wheel from source for CUDA GPU installations, you need to use the build-wheel-from-source process as documented in the vLLM CUDA installation guide.",
       "sources": [
         {
-          "file_path": "data/raw/vllm-0.10.1/docs/getting_started/installation/gpu/cuda.inc.md",
-          "first_character_index": 5696,
-          "last_character_index": 5736
+          "file_path": "data/raw/vllm-0.10.1/docs/getting_started/installation/gpu.md",
+          "first_character_index": 1828,
+          "last_character_index": 3177
         }
       ],
       "difficulty": "synthetic",
@@ -1056,9 +1056,9 @@
       "answer": "Marlin MOE kernels in vLLM support CUDA architectures 8.0, 8.7, and 9.0+PTX, as defined in the CMakeLists.txt build configuration.",
       "sources": [
         {
-          "file_path": "data/raw/vllm-0.10.1/CMakeLists.txt",
-          "first_character_index": 32779,
-          "last_character_index": 34672
+          "file_path": "data/raw/vllm-0.10.1/vllm/model_executor/layers/quantization/fp8.py",
+          "first_character_index": 21449,
+          "last_character_index": 23410
         }
       ],
       "difficulty": "synthetic",
