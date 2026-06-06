@@ -8,28 +8,31 @@ from src.models.Source import DetailedSource, MinimalSource
 
 
 class Evaluate():
-    def __init__(self, userCommand: EvaluateCommand) -> None:
-        self.config = userCommand
+    def __init__(self, dataset_path, k, answer_path, max_context_length) -> None:
+        self.dataset_path = dataset_path
+        self.k = k
+        self.answer_path = answer_path
+        self.max_context_length = max_context_length
         self.searched_data = self.get_result()
         self.answers = self.get_answered_questions()
 
     def get_result(self) -> StudentDetailedSearchResults:
         """Load search results JSON."""
         try:
-            with open(self.config.dataset_path, "r", encoding="utf-8") as file:
+            with open(self.dataset_path, "r", encoding="utf-8") as file:
                 data = file.read()
                 return StudentDetailedSearchResults(**json.loads(data))
         except Exception:
-            raise (ValueError(f"Cannot read {self.config.dataset_path}"))
+            raise (ValueError(f"Cannot read {self.dataset_path}"))
 
     def get_answered_questions(self) -> RagDataset:
         """Load labeled questions JSON."""
         try:
-            with open(self.config.answer_path, "r", encoding="utf-8") as file:
+            with open(self.answer_path, "r", encoding="utf-8") as file:
                 data = file.read()
                 return RagDataset(**json.loads(data))
         except Exception:
-            raise (ValueError(f"Cannot read {self.config.answer_path}"))
+            raise (ValueError(f"Cannot read {self.answer_path}"))
 
     def calculate_recall(self) -> float:
         total_expected = len(self.answers.rag_questions)
@@ -43,27 +46,25 @@ class Evaluate():
 
         for question in self.searched_data.search_results:
             if question.question_id in answers_dict:
-                if self.is_matching(question, answers_dict):
+                if self.is_matching(question, answers_dict[question.question_id]):
                     count += 1
         recall = (count / total_expected) * 100
-        print(f"\nRecall: {recall:.2f}%")
+        print(f"\nRecall@{self.k}: {recall:.2f}%")
         return recall
 
     def is_matching(self,
                     question: DetailedSearchResults,
-                    answers_dict: dict[str, AnsweredQuestion |
-                                       UnansweredQuestion]
+                    expected_answer: AnsweredQuestion | UnansweredQuestion
                     ) -> bool:
-        expected_answer = answers_dict[question.question_id]
         if not isinstance(expected_answer, AnsweredQuestion):
             return False
-        for qsource in question.retrieved_sources:
+            
+        for qsource in question.retrieved_sources[:self.k]:
             for asource in expected_answer.sources:
-                if qsource.file_path != asource.file_path:
-                    continue
-                if not self.is_overlaped(qsource, asource):
-                    continue
-                return True
+                if qsource.file_path == asource.file_path:
+                    if self.is_overlaped(qsource, asource):
+                        return True
+        print(question.question)
         return False
 
     def is_overlaped(

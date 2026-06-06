@@ -67,7 +67,11 @@ def main() -> None:
                 answerDataset.createdAnswerDatasetFile()
 
             case Actions.EVALUATE:
-                recall = Evaluate(cast(EvaluateCommand, userInput))
+                userInput = cast(EvaluateCommand, userInput)
+                recall = Evaluate(userInput.dataset_path,
+                                  userInput.k,
+                                  userInput.answer_path,
+                                  userInput.max_context_length)
                 recall.calculate_recall()
     except KeyboardInterrupt:
         print("KeyboardInterrupt")

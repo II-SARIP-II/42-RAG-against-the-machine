@@ -28,7 +28,7 @@ class IndexCommand(UserCommand):
 
 class SearchCommand(UserCommand):
     action: Literal[Actions.SEARCH] = Actions.SEARCH
-    k: int = Field(default=5, ge=1)
+    k: int = Field(default=5, ge=1, le=25)
     prompt: str
     save_directory: Path = Field(default=Path("data/output/search_results"))
     chroma: bool = Field(default=False)
@@ -37,7 +37,7 @@ class SearchCommand(UserCommand):
 
 class SearchDatasetCommand(UserCommand):
     action: Literal[Actions.SEARCH_DATASET] = Actions.SEARCH_DATASET
-    k: int = Field(default=5, ge=1)
+    k: int = Field(default=5, ge=1, le=25)
     dataset_path: FilePath
     save_directory: Path = Field(default=Path("data/output/search_results"))
     chroma: bool = Field(default=False)
@@ -47,20 +47,20 @@ class SearchDatasetCommand(UserCommand):
 class AnswerCommand(UserCommand):
     action: Literal[Actions.ANSWER] = Actions.ANSWER
     prompt: str
-    k: int = Field(default=1, ge=1)
+    k: int = Field(default=1, ge=1, le=25)
 
 
 class AnswerDatasetCommand(UserCommand):
     action: Literal[Actions.ANSWER_DATASET] = Actions.ANSWER_DATASET
     prompts_file: FilePath
-    k: int = Field(default=1, ge=1)
+    k: int = Field(default=1, ge=1, le=25)
 
 
 class EvaluateCommand(UserCommand):
     action: Literal[Actions.EVALUATE] = Actions.EVALUATE
     answer_path: FilePath
     dataset_path: FilePath
-    k: int = Field(default=1, ge=1)
+    k: int = Field(default=1, ge=1, le=25)
     max_context_length: int = Field(default=2000, ge=1)
 
 
