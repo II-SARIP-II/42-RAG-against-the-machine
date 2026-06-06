@@ -154,11 +154,12 @@ bm25 + chromadb = 61%
 bm25 + chromadb + query expansion = 56%
 bm25 + query expansion = 54%
 Because the llm is not smart, the query expansion is bad
-For the docs, my code only go to 80%/81% (for k=5) but can be higher if k > 5
-only bm25 recall@5 = 80%
-bm25 + chromadb = 61%
-bm25 + chromadb + query expansion = 56%
-bm25 + query expansion = 54%
+For the docs,
+only bm25 recall@5 = 85%
+bm25 + chromadb = 79%
+bm25 + chromadb + query expansion = 78%
+bm25 + query expansion = 87%
+
 # Design decisions
 I decided to use the vllm (bonus) by fixing the vllm thanks to my peer https://github.com/Arcanovax
 I also implemented semantic search, hybrid search and query expansion

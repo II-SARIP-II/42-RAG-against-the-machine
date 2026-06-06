@@ -1,10 +1,13 @@
 FLK 	:= flake8
 MYPY 	:= mypy
 FLAGS	:= --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+DEP 	:= pydantic fire langchain-text-splitters bm25s PyStemmer numpy tqdm dspy chromadb flake8 mypy
+
+export UV_CACHE_DIR := $(shell echo /goinfre/pgougne/Ragcache)
 
 install:
 	uv python pin 3.11
-	uv add pydantic fire langchain-text-splitters bm25s PyStemmer numpy tqdm dspy chromadb
+	uv add $(DEP)
 
 run:
 	@uv run python -m src index
@@ -13,10 +16,10 @@ index:
 	@uv run python -m src index --chroma=True
 
 search:
-	@uv run python -m src search --k=5 --prompt="What activation formats does the fused batched MoE layer return in vLLM?" --chroma=True --save_directory="data/output/search_results"
+	@uv run python -m src search --k=5 --prompt="What HTTP endpoint is used to dynamically load a LoRA adapter in vLLM?" --chroma=False --save_directory="data/output/search_results" --expansion=False
 
 search-dataset:
-	@uv run python -m src search_dataset --k=5 --dataset_path=datasets_public/public/AnsweredQuestions/dataset_docs_public.json --chroma=False
+	@uv run python -m src search_dataset --k=5 --dataset_path=datasets_public/public/AnsweredQuestions/dataset_docs_public.json --chroma=True --expansion=False
 
 answer:
 	@uv run python -m src answer "What activation formats does the fused batched MoE layer return in vLLM?"
@@ -26,9 +29,6 @@ answer-dataset:
 
 evaluate:
 	@uv run python -m src evaluate --dataset_path=data/output/search_results/dataset_docs_public.json --max_context_length=2000 --answer_path=datasets_public/public/AnsweredQuestions/dataset_docs_public.json --k=5
-
-redicCache:
-	export UV_CACHE_DIR="~/goinfre/Ragcache"
 
 debug:
 	@uv run python -m pdb src/__main__.py
@@ -51,4 +51,4 @@ venv:
 init:
 	uv init
 
-.PHONY: install, run, debug, clean, lint, lint-strict, venv, init, index, search, search_dataset, answer, answer_dataset, evaluate
+.PHONY: install run debug clean fclean re lint lint-strict venv init index search search-dataset answer answer-dataset evaluate
