@@ -1,4 +1,8 @@
 import os
+
+from src.models.CommandLine import IndexCommand
+from src.models.Source import DetailedSource
+
 import json
 from typing import Any, List
 import bm25s
@@ -7,8 +11,6 @@ from langchain_text_splitters import (
     RecursiveCharacterTextSplitter,
     Language
 )
-from src.models.CommandLine import IndexCommand
-from src.models.Source import DetailedSource
 import chromadb
 
 

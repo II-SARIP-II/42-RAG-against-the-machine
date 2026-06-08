@@ -1,4 +1,5 @@
 from .Source import MinimalSource, DetailedSource
+
 from typing import List
 from pydantic import BaseModel
 

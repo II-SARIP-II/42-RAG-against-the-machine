@@ -1,10 +1,12 @@
+import os
+
 from src.models.Question import UnansweredQuestion, AnsweredQuestion
 from src.models.Result import StudentDetailedSearchResults
 from src.search.search import Search
+
 from pydantic import TypeAdapter
 import json
 from typing import Union
-import os
 from pathlib import Path
 from tqdm import tqdm
 

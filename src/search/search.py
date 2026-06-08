@@ -1,16 +1,18 @@
+import os
+import sys
+
 from src.models.Source import DetailedSource
 from src.models.Result import (DetailedSearchResults,
                                StudentDetailedSearchResults)
+from .queryExpansion import Expansion_sign
+
 from pathlib import Path
 import bm25s
 import json
-import os
 from typing import List, cast, Any, Dict
 import chromadb
 import dspy
-from .queryExpansion import Expansion_sign
 import logging
-import sys
 
 
 logging.getLogger("dspy").setLevel(logging.ERROR)

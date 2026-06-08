@@ -1,10 +1,11 @@
 from src.models.Result import (StudentDetailedSearchResults,
                                DetailedSearchResults)
 from src.models.RagDataset import RagDataset
-import json
-from pathlib import Path
 from src.models.Question import AnsweredQuestion, UnansweredQuestion
 from src.models.Source import DetailedSource, MinimalSource
+
+import json
+from pathlib import Path
 
 
 class Evaluate():

@@ -11,8 +11,9 @@ from .search.search import Search
 from .answer.answer import Answer
 from .search.searchDataset import SearchDataset
 from .answer.answerDataset import AnswerDataset
-from typing import cast
 from .evaluate.evaluate import Evaluate
+
+from typing import cast
 
 
 def main() -> None:

@@ -1,8 +1,10 @@
+import sys
+
 from src.models.CommandLine import (
     IndexCommand, SearchCommand, SearchDatasetCommand,
     AnswerCommand, AnswerDatasetCommand, EvaluateCommand, UserCommand
 )
-import sys
+
 import fire
 from pydantic import ValidationError
 from pathlib import Path

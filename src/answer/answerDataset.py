@@ -1,9 +1,11 @@
+import os
+
 from src.models.CommandLine import AnswerDatasetCommand
 from src.models.Result import (StudentDetailedSearchResults,
                                StudentDetailedSearchResultsAndAnswer,
                                DetailedAnswer)
 from .answer import Answer
-import os
+
 import json
 from tqdm import tqdm
 from typing import List, cast
