@@ -1,11 +1,13 @@
+import os.path
+
 from src.models.Result import (DetailedAnswer,
                                StudentDetailedSearchResults,
                                StudentDetailedSearchResultsAndAnswer)
+from .dspy import RAG_sign
+
 from typing import List, Any
-import os.path
 import json
 import dspy
-from .dspy import RAG_sign
 from pathlib import Path
 
 
@@ -47,6 +49,9 @@ class Answer():
             searchResultsDict
             )
         self.searchResults = searchResults.search_results[0]
+        if self.searchResults.question != self.question:
+            raise ValueError("You must search and answer "
+                             "with the same question")
 
     def findChunks(self) -> None:
         """Reads the raw files using character slices from search results."""
