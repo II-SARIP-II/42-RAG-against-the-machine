@@ -124,6 +124,7 @@ class Indexing:
         with open(output_json_path, "w", encoding="utf-8") as f:
             json.dump(self.chunks_complete_data, f,
                       indent=4, ensure_ascii=False)
+        print("Indexing finished")
 
     @staticmethod
     def get_language(extension: str) -> Language | None:

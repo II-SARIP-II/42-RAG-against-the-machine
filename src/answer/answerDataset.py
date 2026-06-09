@@ -55,3 +55,4 @@ class AnswerDataset():
                 indent=4,
                 ensure_ascii=False
                 )
+        print(f"Answers saved in {json_path}")

@@ -129,3 +129,4 @@ class Answer():
         json_path = self.output_json_path + "/answer.json"
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(self.minimalAnswer, f, indent=4, ensure_ascii=False)
+        print(f"Answer saved in {json_path}")

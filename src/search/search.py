@@ -198,3 +198,4 @@ class Search():
                       f,
                       indent=4,
                       ensure_ascii=False)
+        print("Data saved in", path)

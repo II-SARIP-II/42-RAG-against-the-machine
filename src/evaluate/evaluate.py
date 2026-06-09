@@ -82,6 +82,8 @@ class Evaluate():
                 qsource.first_character_index > self.max_context_length):
             qsource.last_character_index = (qsource.first_character_index +
                                             self.max_context_length)
+            print(f"{qsource.chunk_id} is higher than "
+                  f"{self.max_context_length} characters")
         overlap_start = max([qsource.first_character_index,
                              asource.first_character_index])
         overlap_end = min([qsource.last_character_index,

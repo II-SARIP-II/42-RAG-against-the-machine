@@ -16,7 +16,7 @@ index:
 	@uv run python -m src index --chroma=True
 
 search:
-	@uv run python -m src search --k=5 --prompt="What HTTP endpoint is used to dynamically load a LoRA adapter in vLLM?" --chroma=False --save_directory="data/output/search_results" --expansion=False
+	@uv run python -m src search --k=5 --prompt="What activation formats does the fused batched MoE layer return in vLLM?" --chroma=False --save_directory="data/output/search_results" --expansion=False
 
 search-dataset:
 	@uv run python -m src search_dataset --k=5 --dataset_path=datasets_public/public/AnsweredQuestions/dataset_docs_public.json --chroma=False --expansion=False
